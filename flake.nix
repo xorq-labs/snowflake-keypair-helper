@@ -1,5 +1,5 @@
 {
-  description = "hello world application using uv2nix";
+  description = "snowflake-keypair-helper application using uv2nix";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -69,7 +69,7 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
           pythonSet = pythonSets.${system}.overrideScope editableOverlay;
-          virtualenv = pythonSet.mkVirtualEnv "hello-world-dev-env" workspace.deps.all;
+          virtualenv = pythonSet.mkVirtualEnv "snowflake-keypair-helper-dev-env" workspace.deps.all;
         in
         {
           default = pkgs.mkShell {
@@ -91,7 +91,7 @@
       );
 
       packages = forAllSystems (system: {
-        default = pythonSets.${system}.mkVirtualEnv "hello-world-env" workspace.deps.default;
+        default = pythonSets.${system}.mkVirtualEnv "snowflake-keypair-helper-env" workspace.deps.default;
       });
     };
 }
