@@ -15,7 +15,6 @@ from snowflake_keypair_helper.constants import (
     default_database,
     default_schema,
     snowflake_env_var_prefix,
-    gh_test_user,
 )
 
 
