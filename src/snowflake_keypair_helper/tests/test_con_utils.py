@@ -9,10 +9,13 @@ from snowflake_keypair_helper.con_utils import (
     connect_env_private_key,
     con_to_adbc_con,
     deassign_public_key,
+    generate_and_set_keypair,
+)
+from snowflake_keypair_helper.constants import (
     default_database,
     default_schema,
     gh_test_user,
-    generate_and_set_keypair,
+    gh_user,
 )
 from snowflake_keypair_helper.crypto_utils import (
     SnowflakeKeypair
@@ -22,6 +25,7 @@ from snowflake_keypair_helper.crypto_utils import (
 @pytest.fixture
 def con():
     con = connect_env_private_key()
+    assert con.user == gh_user
     return con
 
 
