@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.12"
 dependencies = [
+ "adbc-driver-snowflake>=1.8.0",
  "snowflake-connector-python>=3.17.4",
 ]
 
