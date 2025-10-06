@@ -1,0 +1,19 @@
+#! /usr/bin/env bash
+set -eux
+python=${PYTHON:-python3}
+venv_dir=${VENV_DIR:-~/.cache/xorq/with-uvenv}
+
+if [ -z "${1:-}" ]; then
+    set uv run uv sync --all-groups
+fi
+
+if [ ! -d "$venv_dir" ]; then
+    "$python" -m venv --without-pip "$venv_dir"
+    source "$venv_dir/bin/activate"
+    "$python" <(curl https://bootstrap.pypa.io/get-pip.py)
+    pip install uv
+else
+    source "$venv_dir/bin/activate"
+fi
+
+"${@}"
