@@ -12,6 +12,10 @@ dependencies = [
 requires = ["uv_build>=0.8.14,<0.9.0"]
 build-backend = "uv_build"
 
+[project.urls]
+Repository = "https://github.com/xorq-labs/snowflake-keypair-helper/"
+Issues = "https://github.com/xorq-labs/snowflake-keypair-helper/issues"
+
 [dependency-groups]
 dev = [
     "ipython>=9.6.0",
@@ -19,3 +23,9 @@ dev = [
 test = [
     "pytest>=8.4.2",
 ]
+
+[tool.pytest.ini_options]
+markers = [
+    "needs_gh_test_role_access",
+]
+addopts = "--pdbcls=IPython.terminal.debugger:TerminalPdb"
