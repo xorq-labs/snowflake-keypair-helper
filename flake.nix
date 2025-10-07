@@ -21,14 +21,21 @@
       inputs.uv2nix.follows = "uv2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nix-utils = {
+      url = "github:xorq-labs/nix-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
     {
+      self,
       nixpkgs,
       pyproject-nix,
       uv2nix,
       pyproject-build-systems,
+      nix-utils,
       ...
     }:
     let
@@ -64,6 +71,40 @@
 
     in
     {
+      formatter = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        pkgs.nixfmt-tree
+      );
+      apps = forAllSystems (
+        system:
+        let
+          pythonSet = pythonSets.${system}.overrideScope editableOverlay;
+          virtualenv = pythonSet.mkVirtualEnv "snowflake-keypair-helper-dev-env" workspace.deps.all;
+          inherit (nix-utils.lib.${system}.utils) drvToApp;
+        in
+        {
+          ipython = drvToApp {
+            drv = virtualenv;
+            name = "ipython";
+          };
+          generate-envrc = drvToApp {
+            drv = virtualenv;
+            name = "generate-envrc";
+          };
+          assign-public-key = drvToApp {
+            drv = virtualenv;
+            name = "assign-public-key";
+          };
+          generate-and-assign-keypair = drvToApp {
+            drv = virtualenv;
+            name = "generate-and-assign-keypair";
+          };
+          default = self.apps.${system}.ipython;
+        }
+      );
       devShells = forAllSystems (
         system:
         let
