@@ -26,7 +26,7 @@ def gen_commands():
     yield from commands
 
 
-@click.command()
+@click.command(help="generate a new public key and write it to the given path")
 @click.argument("path")
 @click.option("--password", default=None)
 @click.option("--prefix", default=snowflake_env_var_prefix)
@@ -43,7 +43,7 @@ def generate_envrc(
     return path
 
 
-@click.command()
+@click.command(help="assign a public key to a user")
 @click.argument("user")
 @click.argument("public_key_str")
 @click.option("--envrc-path", default=devnull)
@@ -52,7 +52,9 @@ def assign_public_key(user, public_key_str, envrc_path=devnull):
     _assign_public_key(con, user, public_key_str, assert_value=True)
 
 
-@click.command()
+@click.command(
+    help="generate a new keypair, write it to disk and assign the public key to a user"
+)
 @click.argument("user")
 @click.option("--path", default=None)
 @click.option("--envrc-path", default=devnull)
