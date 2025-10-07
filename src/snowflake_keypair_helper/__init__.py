@@ -1,12 +1,13 @@
 from snowflake_keypair_helper.con_utils import (
     assign_public_key,
     con_to_adbc_con,
+    connect_env_envrc,
     connect_env_keypair,
     connect_env_password,
     connect_env_password_mfa,
     connect_env_private_key,
     deassign_public_key,
-    generate_and_set_keypair,
+    generate_and_assign_keypair,
 )
 from snowflake_keypair_helper.crypto_utils import (
     SnowflakeKeypair,
@@ -20,12 +21,13 @@ __all__ = [
     # con_utils
     "assign_public_key",
     "con_to_adbc_con",
+    "connect_env_envrc",
     "connect_env_keypair",
     "connect_env_password",
     "connect_env_password_mfa",
     "connect_env_private_key",
     "deassign_public_key",
-    "generate_and_set_keypair",
+    "generate_and_assign_keypair",
     # crypto_utils
     "SnowflakeKeypair",
     "decrypt_private_bytes_snowflake",

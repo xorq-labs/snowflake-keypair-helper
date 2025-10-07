@@ -9,7 +9,7 @@ from snowflake_keypair_helper.con_utils import (
     connect_env_private_key,
     con_to_adbc_con,
     deassign_public_key,
-    generate_and_set_keypair,
+    generate_and_assign_keypair,
 )
 from snowflake_keypair_helper.constants import (
     default_database,
@@ -17,9 +17,7 @@ from snowflake_keypair_helper.constants import (
     gh_test_user,
     gh_user,
 )
-from snowflake_keypair_helper.crypto_utils import (
-    SnowflakeKeypair
-)
+from snowflake_keypair_helper.crypto_utils import SnowflakeKeypair
 
 
 @pytest.fixture
@@ -43,7 +41,10 @@ def test_defaults(con):
 
 def test_private_bytes_matches_environment(con, keypair_from_env):
     # check that con holds on to unencrypted DER
-    assert keypair_from_env.get_private_bytes(encoding=Encoding.DER, encrypted=False) == con._private_key
+    assert (
+        keypair_from_env.get_private_bytes(encoding=Encoding.DER, encrypted=False)
+        == con._private_key
+    )
 
 
 def test_connect_adbc_from_con(con):
@@ -66,9 +67,14 @@ def test_connect_env_keypair(con, keypair_from_env):
 
 def test_connect_env_private_key_from_keypair_both_ways(keypair_from_env):
     # use encrypted key
-    con0 = connect_env_private_key(private_key=keypair_from_env.private_str, private_key_pwd=keypair_from_env.private_key_pwd)
+    con0 = connect_env_private_key(
+        private_key=keypair_from_env.private_str,
+        private_key_pwd=keypair_from_env.private_key_pwd,
+    )
     # use unencrypted key: if we pass unencrypted (bytes), we must override pwd
-    con1 = connect_env_private_key(private_key=keypair_from_env.private_str_unencrypted, private_key_pwd=None)
+    con1 = connect_env_private_key(
+        private_key=keypair_from_env.private_str_unencrypted, private_key_pwd=None
+    )
     assert con0._private_key == con1._private_key
 
 
@@ -76,7 +82,7 @@ def test_connect_env_private_key_from_keypair_both_ways(keypair_from_env):
 def test_assign_deassign_public_key(con):
     user = gh_test_user
     # this invokes assign_public_key
-    path = generate_and_set_keypair(con, user=user)
+    path = generate_and_assign_keypair(con, user=user)
     new_keypair = SnowflakeKeypair.from_envrc(path)
     gh_test_user_con = connect_env_keypair(new_keypair, user=user)
     assert gh_test_user_con.user == user

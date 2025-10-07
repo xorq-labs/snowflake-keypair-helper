@@ -33,17 +33,24 @@ def get_env_vars(*names, prefix=""):
     env_vars = {
         name: value
         for name, value in (
-            (name, os.environ.get(make_env_name(name, prefix=prefix)))
-            for name in names
+            (name, os.environ.get(make_env_name(name, prefix=prefix))) for name in names
         )
         if value is not None
     }
     return env_vars
 
 
-(get_connection_defaults, get_credentials_defaults_private_key, get_credentials_defaults_password) = (
+(
+    get_connection_defaults,
+    get_credentials_defaults_private_key,
+    get_credentials_defaults_password,
+) = (
     functools.partial(get_env_vars, *fields.value, prefix=snowflake_env_var_prefix)
-    for fields in (SnowflakeFields.connection, SnowflakeFields.private_key, SnowflakeFields.password)
+    for fields in (
+        SnowflakeFields.connection,
+        SnowflakeFields.private_key,
+        SnowflakeFields.password,
+    )
 )
 
 
@@ -57,14 +64,33 @@ def connect_env_password_mfa(passcode, **overrides):
     return connect_env_password(passcode=passcode, **overrides)
 
 
-def connect_env_private_key(database=default_database, schema=default_schema, **overrides):
-    from snowflake_keypair_helper.crypto_utils import maybe_decrypt_private_key_snowflake
-    kwargs = maybe_decrypt_private_key_snowflake(get_connection_defaults() | get_credentials_defaults_private_key() | overrides)
+def connect_env_private_key(
+    database=default_database, schema=default_schema, **overrides
+):
+    from snowflake_keypair_helper.crypto_utils import (
+        maybe_decrypt_private_key_snowflake,
+    )
+
+    kwargs = maybe_decrypt_private_key_snowflake(
+        get_connection_defaults() | get_credentials_defaults_private_key() | overrides
+    )
     con = connect(database=database, schema=schema, **kwargs)
     return con
 
 
-def connect_env_keypair(keypair, database=default_database, schema=default_schema, **overrides):
+def connect_env_envrc(
+    envrc_path, database=default_database, schema=default_schema, **overrides
+):
+    from snowflake_keypair_helper.env_utils import with_envrc
+
+    with with_envrc(envrc_path):
+        con = connect_env_private_key(database=database, schema=schema, **overrides)
+    return con
+
+
+def connect_env_keypair(
+    keypair, database=default_database, schema=default_schema, **overrides
+):
     return connect_env_private_key(
         private_key=keypair.private_str,
         private_key_pwd=keypair.private_key_pwd,
@@ -74,17 +100,20 @@ def connect_env_keypair(keypair, database=default_database, schema=default_schem
     )
 
 
-def con_to_adbc_kwargs(con, database=default_database, schema=default_schema, **uri_overrides):
+def con_to_adbc_kwargs(
+    con, database=default_database, schema=default_schema, **uri_overrides
+):
     def make_uri(con, database, schema, **uri_overrides):
-        params = {
-            attr: getattr(con, attr)
-            for attr in ("user", "host", "warehouse", "role")
-        } | {
-            # ADBC connection always requires a password, even if using private key
-            "password": con._password or "nopassword",
-            "database": database,
-            "schema": schema,
-        } | uri_overrides
+        params = (
+            {attr: getattr(con, attr) for attr in ("user", "host", "warehouse", "role")}
+            | {
+                # ADBC connection always requires a password, even if using private key
+                "password": con._password or "nopassword",
+                "database": database,
+                "schema": schema,
+            }
+            | uri_overrides
+        )
         uri = f"{params['user']}:{params['password']}@{params['host']}/{params['database']}/{params['schema']}?warehouse={params['warehouse']}&role={params['role']}"
         return uri
 
@@ -92,6 +121,7 @@ def con_to_adbc_kwargs(con, database=default_database, schema=default_schema, **
         is_keypair_auth = (con._authenticator or "").upper() == "SNOWFLAKE_JWT"
         if is_keypair_auth:
             from snowflake_keypair_helper.crypto_utils import SnowflakeKeypair
+
             # we know the private key is unencrypted DER format
             keypair = SnowflakeKeypair.from_bytes_der(con._private_key)
             db_kwargs = {
@@ -134,34 +164,39 @@ def adbc_ingest(
 def execute_statements(con, statements):
     def make_dcts(cursor):
         return tuple(
-            dict(zip(
-                (el.name for el in cursor.description),
-                line,
-            ))
+            dict(
+                zip(
+                    (el.name for el in cursor.description),
+                    line,
+                )
+            )
             for line in cursor.fetchall()
         )
+
     cursors = con.execute_string(statements)
     fetched = tuple(dct for cursor in cursors for dct in make_dcts(cursor))
     return fetched
 
 
-def assign_public_key(con, user, public_key_str):
+def assign_public_key(con, user, public_key_str, assert_value=True):
     def massage_public_key_str(public_key_str):
         # https://docs.snowflake.com/en/user-guide/key-pair-auth#assign-the-public-key-to-a-snowflake-user
         # # Note: Exclude the public key delimiters in the SQL statement.
         sep = "\n"
-        (preamble, *lines, postamble, end) = public_key_str.split(sep)
-        assert (preamble, postamble, end) == (
+        (preamble, *lines, postamble) = public_key_str.strip().split(sep)
+        assert (preamble, postamble) == (
             "-----BEGIN PUBLIC KEY-----",
             "-----END PUBLIC KEY-----",
-            "",
         )
         massaged = sep.join(lines)
         return massaged
 
     massaged_text = massage_public_key_str(public_key_str)
     statement = f"ALTER USER {user} SET RSA_PUBLIC_KEY='{massaged_text}';"
-    return execute_statements(con, statement)
+    dcts = execute_statements(con, statement)
+    if assert_value:
+        assert dcts == ({"status": "Statement executed successfully."},), dcts
+    return dcts
 
 
 def deassign_public_key(con, user):
@@ -169,11 +204,12 @@ def deassign_public_key(con, user):
     return execute_statements(con, statement)
 
 
-def generate_and_set_keypair(con, user, path=None):
+def generate_and_assign_keypair(con, user, path=None):
     from snowflake_keypair_helper.crypto_utils import (
         SnowflakeKeypair,
         make_user_envrc_path,
     )
+
     path = Path(path or make_user_envrc_path(user))
     keypair = SnowflakeKeypair.generate()
     keypair.to_envrc(path)
