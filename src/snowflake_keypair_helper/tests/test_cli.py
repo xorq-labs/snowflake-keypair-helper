@@ -59,3 +59,13 @@ def test_cli_generate_envrc_stdout(tmp_path, monkeypatch):
     dct = parse_env_file(path)
     assert dct
     assert all(key.startswith(snowflake_env_var_prefix) for key in dct)
+
+
+def test_cli_list_cli_commands(tmp_path, monkeypatch):
+    # writes to stdout, not cwd/stderr
+    monkeypatch.chdir(tmp_path)
+    (returncode, out, err, _) = do_popen_communicate("list-cli-commands")
+    assert not returncode
+    assert not err
+    assert not tuple(tmp_path.iterdir())
+    assert all(command.name in out for command in gen_commands())

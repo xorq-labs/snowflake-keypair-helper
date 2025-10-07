@@ -29,6 +29,7 @@ Issues = "https://github.com/xorq-labs/snowflake-keypair-helper/issues"
 generate-envrc = "snowflake_keypair_helper.cli:generate_envrc"
 assign-public-key = "snowflake_keypair_helper.cli:assign_public_key"
 generate-and-assign-keypair = "snowflake_keypair_helper.cli:generate_and_assign_keypair"
+list-cli-commands = "snowflake_keypair_helper.cli:list_cli_commands"
 
 [dependency-groups]
 dev = [

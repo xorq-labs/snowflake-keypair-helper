@@ -61,3 +61,13 @@ def assign_public_key(user, public_key_str, envrc_path=devnull):
 def generate_and_assign_keypair(user, path=None, envrc_path=devnull):
     con = connect_env_envrc(envrc_path)
     _generate_and_assign_keypair(con, user, path=path)
+
+
+@click.command(help=f"list all commands available from this cli ({__package__})")
+def list_cli_commands():
+    print(
+        "\n".join(
+            f"{command.name}: {command.help if command.help else 'no help string specified'}"
+            for command in gen_commands()
+        )
+    )
