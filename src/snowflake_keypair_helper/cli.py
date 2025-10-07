@@ -1,3 +1,4 @@
+import importlib
 from os import devnull
 from pathlib import Path
 
@@ -14,6 +15,15 @@ from snowflake_keypair_helper.constants import (
 from snowflake_keypair_helper.crypto_utils import (
     SnowflakeKeypair,
 )
+
+
+def gen_commands():
+    commands = (
+        value
+        for value in importlib.import_module(__name__).__dict__.values()
+        if isinstance(value, click.Command)
+    )
+    yield from commands
 
 
 @click.command()
