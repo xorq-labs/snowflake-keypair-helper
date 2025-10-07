@@ -1,11 +1,17 @@
 [project]
 name = "snowflake-keypair-helper"
 version = "0.1.0"
-description = "Add your description here"
+description = "A library for creating, managing and using keypairs to authenticate to Snowflake"
 requires-python = ">=3.12"
 dependencies = [
  "adbc-driver-snowflake>=1.8.0",
  "snowflake-connector-python>=3.17.4",
+]
+authors = [
+    { name = "Dan Lovell", email = "dan@letsql.com" },
+]
+maintainers = [
+    { name = "Dan Lovell", email = "dan@letsql.com" },
 ]
 
 [build-system]
@@ -19,6 +25,7 @@ Issues = "https://github.com/xorq-labs/snowflake-keypair-helper/issues"
 [dependency-groups]
 dev = [
     "ipython>=9.6.0",
+    "pre-commit>=4.3.0",
 ]
 test = [
     "pytest>=8.4.2",
