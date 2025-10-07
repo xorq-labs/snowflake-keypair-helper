@@ -175,9 +175,9 @@ class SnowflakeKeypair:
 
     def to_envrc(
         self,
-        path=default_path,
-        prefix=prefix,
-        encrypted=True,
+        path: Optional[Path] = default_path,
+        prefix: str = prefix,
+        encrypted: bool = True,
     ):
         from snowflake_keypair_helper.con_utils import make_env_name
 
@@ -203,7 +203,10 @@ class SnowflakeKeypair:
                 for (name, field) in names_fields
             )
         )
-        (path := Path(path)).write_text(text)
+        if path is None:
+            print(text)
+        else:
+            (path := Path(path)).write_text(text)
         return path
 
     @classmethod
