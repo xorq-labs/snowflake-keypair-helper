@@ -8,11 +8,13 @@ dependencies = [
  "click>=8.3.0",
  "snowflake-connector-python>=3.17.4",
 ]
+license = { file = "LICENSE" }
 authors = [
     { name = "Dan Lovell", email = "dan@letsql.com" },
 ]
 maintainers = [
     { name = "Dan Lovell", email = "dan@letsql.com" },
+    { name = "Daniel Mesejo", email = "mesejo@letsql.com" },
 ]
 
 [build-system]
