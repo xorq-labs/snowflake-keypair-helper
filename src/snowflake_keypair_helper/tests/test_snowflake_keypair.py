@@ -79,29 +79,41 @@ def test_varying_encrypted_private_bytes_but_same_private_numbers():
 def test_unecrypted_same_private_str():
     keypair = SnowflakeKeypair.generate()
     actual = keypair.private_str_unencrypted
-    expected = keypair.get_private_bytes(encoding=Encoding.PEM, format=PrivateFormat.PKCS8, encrypted=False).decode("ascii")
+    expected = keypair.get_private_bytes(
+        encoding=Encoding.PEM, format=PrivateFormat.PKCS8, encrypted=False
+    ).decode("ascii")
     assert actual == expected
 
 
-@pytest.mark.parametrize("encoding,ctor", (
-    (Encoding.DER, SnowflakeKeypair.from_bytes_der),
-    (Encoding.PEM, SnowflakeKeypair.from_bytes_pem),
-    (Encoding.PEM, SnowflakeKeypair.from_bytes),
-))
+@pytest.mark.parametrize(
+    "encoding,ctor",
+    (
+        (Encoding.DER, SnowflakeKeypair.from_bytes_der),
+        (Encoding.PEM, SnowflakeKeypair.from_bytes_pem),
+        (Encoding.PEM, SnowflakeKeypair.from_bytes),
+    ),
+)
 def test_unecrypted_roundtrip(encoding, ctor):
     keypair0 = SnowflakeKeypair.generate()
-    unencrypted_bytes = keypair0.get_private_bytes(encoding=encoding, format=PrivateFormat.PKCS8, encrypted=False)
+    unencrypted_bytes = keypair0.get_private_bytes(
+        encoding=encoding, format=PrivateFormat.PKCS8, encrypted=False
+    )
     keypair1 = ctor(unencrypted_bytes).with_password(keypair0.private_key_pwd)
     assert keypair0 == keypair1
 
 
-@pytest.mark.parametrize("encoding,ctor", (
-    (Encoding.DER, SnowflakeKeypair.from_bytes_der),
-    (Encoding.PEM, SnowflakeKeypair.from_bytes_pem),
-))
+@pytest.mark.parametrize(
+    "encoding,ctor",
+    (
+        (Encoding.DER, SnowflakeKeypair.from_bytes_der),
+        (Encoding.PEM, SnowflakeKeypair.from_bytes_pem),
+    ),
+)
 def test_ecrypted_roundtrip(encoding, ctor):
     keypair0 = SnowflakeKeypair.generate()
-    encrypted_bytes = keypair0.get_private_bytes(encoding=encoding, format=PrivateFormat.PKCS8, encrypted=True)
+    encrypted_bytes = keypair0.get_private_bytes(
+        encoding=encoding, format=PrivateFormat.PKCS8, encrypted=True
+    )
     keypair1 = ctor(encrypted_bytes, keypair0.private_key_pwd)
     assert keypair0 == keypair1
 
