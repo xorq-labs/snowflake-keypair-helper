@@ -1,0 +1,52 @@
+from os import devnull
+
+import click
+
+from snowflake_keypair_helper.con_utils import (
+    assign_public_key as _assign_public_key,
+    connect_env_envrc,
+    generate_and_assign_keypair as _generate_and_assign_keypair,
+)
+from snowflake_keypair_helper.constants import (
+    snowflake_env_var_prefix,
+)
+from snowflake_keypair_helper.crypto_utils import (
+    SnowflakeKeypair,
+    make_user_envrc_path,
+)
+
+
+@click.command()
+@click.argument("path-prefix")
+@click.option("--password", default=None)
+@click.option("--prefix", default=snowflake_env_var_prefix)
+@click.option("--encrypted/--no-encrypted", default=True)
+def generate_envrc(
+    path_prefix,
+    password=None,
+    prefix=snowflake_env_var_prefix,
+    encrypted=True,
+):
+    keypair = SnowflakeKeypair.generate(password=password)
+    path = keypair.to_envrc(
+        path=make_user_envrc_path(path_prefix), prefix=prefix, encrypted=encrypted
+    )
+    return path
+
+
+@click.command()
+@click.argument("user")
+@click.argument("public_key_str")
+@click.option("--envrc-path", default=devnull)
+def assign_public_key(user, public_key_str, envrc_path=devnull):
+    con = connect_env_envrc(envrc_path)
+    _assign_public_key(con, user, public_key_str, assert_value=True)
+
+
+@click.command()
+@click.argument("user")
+@click.option("--path", default=None)
+@click.option("--envrc-path", default=devnull)
+def generate_and_assign_keypair(user, path=None, envrc_path=devnull):
+    con = connect_env_envrc(envrc_path)
+    _generate_and_assign_keypair(con, user, path=path)
