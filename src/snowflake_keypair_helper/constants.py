@@ -1,3 +1,4 @@
+from sysconfig import get_python_version
 from pathlib import Path
 
 
@@ -10,5 +11,5 @@ default_warehouse = "COMPUTE_WH"
 
 
 gh_user = "GH_USER"
-gh_test_user = "GH_TEST_USER"
+gh_test_user = f"GH_TEST_USER_PY{get_python_version().replace('.', '')}"
 gh_test_role = "GH_TEST_ROLE"

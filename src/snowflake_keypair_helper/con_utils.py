@@ -1,7 +1,6 @@
 import functools
 import os
 from enum import Enum
-from pathlib import Path
 
 import adbc_driver_snowflake.dbapi as dbapi
 from adbc_driver_snowflake import (
@@ -179,20 +178,10 @@ def execute_statements(con, statements):
 
 
 def assign_public_key(con, user, public_key_str, assert_value=True):
-    def massage_public_key_str(public_key_str):
-        # https://docs.snowflake.com/en/user-guide/key-pair-auth#assign-the-public-key-to-a-snowflake-user
-        # # Note: Exclude the public key delimiters in the SQL statement.
-        sep = "\n"
-        (preamble, *lines, postamble) = public_key_str.strip().split(sep)
-        assert (preamble, postamble) == (
-            "-----BEGIN PUBLIC KEY-----",
-            "-----END PUBLIC KEY-----",
-        )
-        massaged = sep.join(lines)
-        return massaged
+    from snowflake_keypair_helper.crypto_utils import remove_public_key_delimiters
 
-    massaged_text = massage_public_key_str(public_key_str)
-    statement = f"ALTER USER {user} SET RSA_PUBLIC_KEY='{massaged_text}';"
+    removed = remove_public_key_delimiters(public_key_str)
+    statement = f"ALTER USER {user} SET RSA_PUBLIC_KEY='{removed}';"
     dcts = execute_statements(con, statement)
     if assert_value:
         assert dcts == ({"status": "Statement executed successfully."},), dcts
@@ -202,16 +191,3 @@ def assign_public_key(con, user, public_key_str, assert_value=True):
 def deassign_public_key(con, user):
     statement = f"ALTER USER {user} UNSET RSA_PUBLIC_KEY;"
     return execute_statements(con, statement)
-
-
-def generate_and_assign_keypair(con, user, path=None):
-    from snowflake_keypair_helper.crypto_utils import (
-        SnowflakeKeypair,
-        make_user_envrc_path,
-    )
-
-    path = Path(path or make_user_envrc_path(user))
-    keypair = SnowflakeKeypair.generate()
-    keypair.to_envrc(path)
-    assign_public_key(con, user, keypair.public_str)
-    return path

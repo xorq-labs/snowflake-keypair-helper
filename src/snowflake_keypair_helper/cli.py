@@ -7,7 +7,6 @@ import click
 from snowflake_keypair_helper.con_utils import (
     assign_public_key as _assign_public_key,
     connect_env_envrc,
-    generate_and_assign_keypair as _generate_and_assign_keypair,
 )
 from snowflake_keypair_helper.constants import (
     snowflake_env_var_prefix,
@@ -15,6 +14,32 @@ from snowflake_keypair_helper.constants import (
 from snowflake_keypair_helper.crypto_utils import (
     SnowflakeKeypair,
 )
+from snowflake_keypair_helper.init_state_utils import (
+    create_user as _create_user,
+)
+
+
+def public_key_from_path(path, prefix=snowflake_env_var_prefix):
+    from snowflake_keypair_helper.env_utils import parse_env_file
+    from snowflake_keypair_helper.con_utils import make_env_name
+
+    dct = parse_env_file(path)
+    public_key = dct[make_env_name("PUBLIC_KEY", prefix=prefix)]
+    return public_key
+
+
+def arbitrate_public_key(
+    public_key_str=None, path=None, prefix=snowflake_env_var_prefix
+):
+    match (path, public_key_str):
+        case [None, None]:
+            raise ValueError("one and only one value must be non None")
+        case [str() | Path(), None]:
+            return public_key_from_path(path, prefix=prefix)
+        case [None, str()]:
+            return public_key_str
+        case _:
+            raise ValueError("improper types pass")
 
 
 def gen_commands():
@@ -26,12 +51,12 @@ def gen_commands():
     yield from commands
 
 
-@click.command(help="generate a new public key and write it to the given path")
+@click.command(help="generate a new keypair and write it to disk")
 @click.argument("path")
 @click.option("--password", default=None)
 @click.option("--prefix", default=snowflake_env_var_prefix)
 @click.option("--encrypted/--no-encrypted", default=True)
-def generate_envrc(
+def generate_keypair(
     path,
     password=None,
     prefix=snowflake_env_var_prefix,
@@ -45,19 +70,28 @@ def generate_envrc(
 
 @click.command(help="assign a public key to a user")
 @click.argument("user")
-@click.argument("public_key_str")
+@click.option("--public_key_str", default=None)
+@click.option("--path", default=None)
 @click.option("--envrc-path", default=devnull)
-def assign_public_key(user, public_key_str, envrc_path=devnull):
+def assign_public_key(user, public_key_str=None, path=None, envrc_path=devnull):
+    public_key_str = arbitrate_public_key(public_key_str=public_key_str, path=path)
     con = connect_env_envrc(envrc_path)
     _assign_public_key(con, user, public_key_str, assert_value=True)
 
 
-@click.command(
-    help="generate a new keypair, write it to disk and assign the public key to a user"
-)
+@click.command()
 @click.argument("user")
-@click.option("--path", default=None)
 @click.option("--envrc-path", default=devnull)
-def generate_and_assign_keypair(user, path=None, envrc_path=devnull):
+def create_user(user, envrc_path=devnull):
     con = connect_env_envrc(envrc_path)
-    _generate_and_assign_keypair(con, user, path=path)
+    _create_user(con, user)
+
+
+@click.command(help=f"list all commands available from this cli ({__package__})")
+def list_cli_commands():
+    print(
+        "\n".join(
+            f"{command.name}: {command.help if command.help else 'no help string specified'}"
+            for command in gen_commands()
+        )
+    )
