@@ -90,17 +90,21 @@
             drv = virtualenv;
             name = "ipython";
           };
-          generate-envrc = drvToApp {
+          generate-keypair = drvToApp {
             drv = virtualenv;
-            name = "generate-envrc";
+            name = "generate-keypair";
           };
           assign-public-key = drvToApp {
             drv = virtualenv;
             name = "assign-public-key";
           };
-          generate-and-assign-keypair = drvToApp {
+          create-user = drvToApp {
             drv = virtualenv;
-            name = "generate-and-assign-keypair";
+            name = "create-user";
+          };
+          list-cli-commands = drvToApp {
+            drv = virtualenv;
+            name = "list-cli-commands";
           };
           default = self.apps.${system}.ipython;
         }
