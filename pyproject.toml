@@ -2,7 +2,7 @@
 name = "snowflake-keypair-helper"
 version = "0.1.0"
 description = "A library for creating, managing and using keypairs to authenticate to Snowflake"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
  "adbc-driver-snowflake>=1.8.0",
  "click>=8.3.0",
@@ -33,7 +33,7 @@ list-cli-commands = "snowflake_keypair_helper.cli:list_cli_commands"
 
 [dependency-groups]
 dev = [
-    "ipython>=9.6.0",
+    "ipython<9.7.0,>=8.19.0",
     "pre-commit>=4.3.0",
 ]
 test = [
