@@ -79,7 +79,7 @@ def assign_public_key(user, public_key_str=None, path=None, envrc_path=devnull):
     _assign_public_key(con, user, public_key_str, assert_value=True)
 
 
-@click.command()
+@click.command(help="create a user")
 @click.argument("user")
 @click.option("--envrc-path", default=devnull)
 def create_user(user, envrc_path=devnull):
