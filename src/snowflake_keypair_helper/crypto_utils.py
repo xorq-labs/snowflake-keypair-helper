@@ -46,6 +46,19 @@ def filter_none_one(el):
     return filter(None, (el,))
 
 
+def remove_public_key_delimiters(public_key_str):
+    # https://docs.snowflake.com/en/user-guide/key-pair-auth#assign-the-public-key-to-a-snowflake-user
+    # # Note: Exclude the public key delimiters in the SQL statement.
+    sep = "\n"
+    (preamble, *lines, postamble) = public_key_str.strip().split(sep)
+    assert (preamble, postamble) == (
+        "-----BEGIN PUBLIC KEY-----",
+        "-----END PUBLIC KEY-----",
+    )
+    removed = sep.join(lines)
+    return removed
+
+
 def decrypt_private_bytes_snowflake(private_bytes: bytes, password_str: str):
     # encrypted PEM to unencrypted DER: for snowflake.connector.connect
     return SnowflakeKeypair.from_bytes_pem(

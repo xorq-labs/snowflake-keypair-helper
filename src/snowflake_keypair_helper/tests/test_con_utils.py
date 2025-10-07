@@ -5,11 +5,11 @@ from cryptography.hazmat.primitives.serialization import (
 from snowflake.connector.errors import DatabaseError
 
 from snowflake_keypair_helper.con_utils import (
+    assign_public_key,
     connect_env_keypair,
     connect_env_private_key,
     con_to_adbc_con,
     deassign_public_key,
-    generate_and_assign_keypair,
 )
 from snowflake_keypair_helper.constants import (
     default_database,
@@ -79,13 +79,14 @@ def test_connect_env_private_key_from_keypair_both_ways(keypair_from_env):
 
 
 @pytest.mark.needs_gh_test_role_access
-def test_assign_deassign_public_key(con):
+def test_assign_deassign_public_key(con, tmp_path):
     user = gh_test_user
-    # this invokes assign_public_key
-    path = generate_and_assign_keypair(con, user=user)
-    new_keypair = SnowflakeKeypair.from_envrc(path)
-    gh_test_user_con = connect_env_keypair(new_keypair, user=user)
+    keypair = SnowflakeKeypair.generate()
+    path = tmp_path.joinpath(f"${user}.envrc")
+    keypair.to_envrc(path)
+    assign_public_key(con, user, keypair.public_str)
+    gh_test_user_con = connect_env_keypair(keypair, user=user)
     assert gh_test_user_con.user == user
     deassign_public_key(con, user)
     with pytest.raises(DatabaseError, match="Failed to connect.*JWT token is invalid"):
-        connect_env_keypair(new_keypair, user=user)
+        connect_env_keypair(keypair, user=user)

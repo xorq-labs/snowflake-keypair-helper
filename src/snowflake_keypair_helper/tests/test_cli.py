@@ -33,11 +33,11 @@ def test_cli_helps(command, tmp_path):
     assert out.startswith(f"Usage: {command} ")
 
 
-def test_cli_generate_envrc_path(tmp_path, monkeypatch):
+def test_cli_generate_keypair_path(tmp_path, monkeypatch):
     # writes to cwd, not stdout/stderr
     monkeypatch.chdir(tmp_path)
     name = "my.envrc"
-    (returncode, out, err, _) = do_popen_communicate("generate-envrc", name)
+    (returncode, out, err, _) = do_popen_communicate("generate-keypair", name)
     assert not returncode
     assert not err
     assert not out
@@ -46,11 +46,11 @@ def test_cli_generate_envrc_path(tmp_path, monkeypatch):
     assert path.name == name
 
 
-def test_cli_generate_envrc_stdout(tmp_path, monkeypatch):
+def test_cli_generate_keypair_stdout(tmp_path, monkeypatch):
     # writes to stdout, not cwd/stderr
     monkeypatch.chdir(tmp_path)
     name = "-"
-    (returncode, out, err, _) = do_popen_communicate("generate-envrc", name)
+    (returncode, out, err, _) = do_popen_communicate("generate-keypair", name)
     assert not returncode
     assert not err
     assert not tuple(tmp_path.iterdir())
