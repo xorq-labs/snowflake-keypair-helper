@@ -6,7 +6,7 @@ import click
 
 from snowflake_keypair_helper.con_utils import (
     assign_public_key as _assign_public_key,
-    connect_env_envrc,
+    connect_env,
 )
 from snowflake_keypair_helper.constants import (
     snowflake_env_var_prefix,
@@ -75,7 +75,7 @@ def generate_keypair(
 @click.option("--envrc-path", default=devnull)
 def assign_public_key(user, public_key_str=None, path=None, envrc_path=devnull):
     public_key_str = arbitrate_public_key(public_key_str=public_key_str, path=path)
-    con = connect_env_envrc(envrc_path)
+    con = connect_env(envrc_path=envrc_path)
     _assign_public_key(con, user, public_key_str, assert_value=True)
 
 
@@ -83,7 +83,7 @@ def assign_public_key(user, public_key_str=None, path=None, envrc_path=devnull):
 @click.argument("user")
 @click.option("--envrc-path", default=devnull)
 def create_user(user, envrc_path=devnull):
-    con = connect_env_envrc(envrc_path)
+    con = connect_env(envrc_path=envrc_path)
     _create_user(con, user)
 
 

@@ -7,7 +7,6 @@ from snowflake.connector.errors import DatabaseError
 from snowflake_keypair_helper.con_utils import (
     assign_public_key,
     connect_env_keypair,
-    connect_env_private_key,
     con_to_adbc_con,
     deassign_public_key,
 )
@@ -22,7 +21,7 @@ from snowflake_keypair_helper.crypto_utils import SnowflakeKeypair
 
 @pytest.fixture
 def con():
-    con = connect_env_private_key()
+    con = connect_env_keypair()
     assert con.user == gh_user
     return con
 
@@ -60,19 +59,19 @@ def test_adbc_ingest():
 
 
 def test_connect_env_keypair(con, keypair_from_env):
-    other = connect_env_keypair(keypair_from_env)
+    other = connect_env_keypair(keypair=keypair_from_env)
     assert con.user == other.user
     assert con._private_key == other._private_key
 
 
 def test_connect_env_private_key_from_keypair_both_ways(keypair_from_env):
     # use encrypted key
-    con0 = connect_env_private_key(
+    con0 = connect_env_keypair(
         private_key=keypair_from_env.private_str,
         private_key_pwd=keypair_from_env.private_key_pwd,
     )
     # use unencrypted key: if we pass unencrypted (bytes), we must override pwd
-    con1 = connect_env_private_key(
+    con1 = connect_env_keypair(
         private_key=keypair_from_env.private_str_unencrypted, private_key_pwd=None
     )
     assert con0._private_key == con1._private_key
@@ -82,11 +81,11 @@ def test_connect_env_private_key_from_keypair_both_ways(keypair_from_env):
 def test_assign_deassign_public_key(con, tmp_path):
     user = gh_test_user
     keypair = SnowflakeKeypair.generate()
-    path = tmp_path.joinpath(f"${user}.envrc")
+    path = tmp_path.joinpath(f"{user}.envrc")
     keypair.to_envrc(path)
     assign_public_key(con, user, keypair.public_str)
-    gh_test_user_con = connect_env_keypair(keypair, user=user)
+    gh_test_user_con = connect_env_keypair(keypair=keypair, user=user)
     assert gh_test_user_con.user == user
     deassign_public_key(con, user)
     with pytest.raises(DatabaseError, match="Failed to connect.*JWT token is invalid"):
-        connect_env_keypair(keypair, user=user)
+        connect_env_keypair(keypair=keypair, user=user)
