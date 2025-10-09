@@ -27,12 +27,11 @@ initialize an environment with
 ```
 this will bootstrap a venv by way of `uv run`
 
-you can subsequently use `./with-uvenv uv run $command` commands
-
-you can also fall back to activating the venv with
+you can subsequently activate the venv with
 ```
 source ./.venv/bin/activate
 ```
+or use `./with-uvenv uv run $command` to run particular commands
 
 ---
 
