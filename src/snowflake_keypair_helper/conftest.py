@@ -1,7 +1,7 @@
 import pytest
 
 from snowflake_keypair_helper.con_utils import (
-    connect_env_private_key,
+    connect_env,
     execute_statements,
 )
 from snowflake_keypair_helper.constants import (
@@ -11,7 +11,7 @@ from snowflake_keypair_helper.constants import (
 
 
 def get_have_role_access(user=gh_user, role=gh_test_role):
-    con = connect_env_private_key(user=user)
+    con = connect_env(user=user)
     dcts = execute_statements(con, f"SHOW GRANTS OF ROLE {role}")
     return any(dct.get("grantee_name") == user for dct in dcts)
 

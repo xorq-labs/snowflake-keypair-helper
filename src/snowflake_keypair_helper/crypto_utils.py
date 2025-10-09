@@ -29,10 +29,6 @@ from snowflake_keypair_helper.dataclass_utils import (
 )
 
 
-def make_user_envrc_path(user):
-    return Path(f"{user.upper()}.envrc.secrets.snowflake.keypair")
-
-
 def make_private_key_pwd(k=20, choices=string.ascii_letters + string.digits):
     return "".join(random.choices(choices, k=k))
 

@@ -3,6 +3,7 @@ import os
 from enum import Enum
 
 import adbc_driver_snowflake.dbapi as dbapi
+import toolz
 from adbc_driver_snowflake import (
     DatabaseOptions,
 )
@@ -15,13 +16,37 @@ from snowflake_keypair_helper.constants import (
     default_schema,
     snowflake_env_var_prefix,
 )
+from snowflake_keypair_helper.env_utils import (
+    with_envrc,
+)
 
 
-class SnowflakeFields(Enum):
-    private_key = ("private_key", "private_key_pwd")
-    password = ("password",)
-    password_mfa = ("password",)
-    connection = ("account", "role", "warehouse", "user")
+try:
+    from enum import StrEnum
+except ImportError:
+    from strenum import StrEnum
+
+
+class SnowflakeAuthenticator(StrEnum):
+    # https://docs.snowflake.com/en/developer-guide/node-js/nodejs-driver-options#label-nodejs-auth-options
+    password = "none"
+    mfa = "username_password_mfa"
+    keypair = "snowflake_jwt"
+    sso = "externalbrowser"
+
+
+class SnowflakeEnvFields(Enum):
+    password = (
+        "user",
+        "password",
+    )
+    mfa = (
+        "user",
+        "password",
+    )
+    keypair = ("user", "private_key", "private_key_pwd")
+    sso = ("user",)
+    connection = ("account", "role", "warehouse")
 
 
 def make_env_name(name, prefix=snowflake_env_var_prefix):
@@ -39,64 +64,82 @@ def get_env_vars(*names, prefix=""):
     return env_vars
 
 
-(
-    get_connection_defaults,
-    get_credentials_defaults_private_key,
-    get_credentials_defaults_password,
-) = (
-    functools.partial(get_env_vars, *fields.value, prefix=snowflake_env_var_prefix)
-    for fields in (
-        SnowflakeFields.connection,
-        SnowflakeFields.private_key,
-        SnowflakeFields.password,
-    )
+def get_authenticator_credentials(
+    authenticator=SnowflakeAuthenticator.keypair, prefix=snowflake_env_var_prefix
+):
+    match str(authenticator).lower():
+        case (
+            SnowflakeAuthenticator.password
+            | SnowflakeAuthenticator.mfa
+            | SnowflakeAuthenticator.keypair
+            | SnowflakeAuthenticator.sso
+        ):
+            fields = SnowflakeEnvFields[authenticator.name]
+            dct = get_env_vars(*fields.value, prefix=prefix)
+            return dct
+        case _:
+            raise ValueError(f"Unknown authenticator: {authenticator}")
+
+
+get_connection_defaults = toolz.curry(
+    get_env_vars, *SnowflakeEnvFields.connection.value, prefix=snowflake_env_var_prefix
 )
 
 
-def connect_env_password(database=default_database, schema=default_schema, **overrides):
-    kwargs = get_connection_defaults() | get_credentials_defaults_password() | overrides
-    con = connect(database=database, schema=schema, **kwargs)
-    return con
+def maybe_process_keypair(kwargs):
+    match kwargs:
+        case {
+            "authenticator": SnowflakeAuthenticator.keypair,
+            "keypair": keypair,
+            **rest,
+        }:
+            # prioritize keypair over ("private_key", "private_key_pwd")
+            # if kwargs.get("private_key") or kwargs.get("private_key_pwd"):
+            #     raise ValueError("cannot pass private_key or private_key_pwd when passing keypair")
+            kwargs = rest | {
+                "authenticator": SnowflakeAuthenticator.keypair,
+                "private_key": keypair.private_str,
+                "private_key_pwd": keypair.private_key_pwd,
+            }
+        case _:
+            pass
+    return kwargs
 
 
-def connect_env_password_mfa(passcode, **overrides):
-    return connect_env_password(passcode=passcode, **overrides)
-
-
-def connect_env_private_key(
-    database=default_database, schema=default_schema, **overrides
+def connect_env(
+    passcode=None,
+    database=default_database,
+    schema=default_schema,
+    authenticator=SnowflakeAuthenticator.keypair,
+    envrc_path=os.devnull,
+    **overrides,
 ):
     from snowflake_keypair_helper.crypto_utils import (
         maybe_decrypt_private_key_snowflake,
     )
 
-    kwargs = maybe_decrypt_private_key_snowflake(
-        get_connection_defaults() | get_credentials_defaults_private_key() | overrides
-    )
+    with with_envrc(envrc_path):
+        kwargs = (
+            get_connection_defaults()
+            | get_authenticator_credentials(authenticator)
+            | {"passcode": passcode, "authenticator": authenticator}
+            | overrides
+        )
+    kwargs = maybe_process_keypair(kwargs)
+    kwargs = maybe_decrypt_private_key_snowflake(kwargs)
     con = connect(database=database, schema=schema, **kwargs)
     return con
 
 
-def connect_env_envrc(
-    envrc_path, database=default_database, schema=default_schema, **overrides
-):
-    from snowflake_keypair_helper.env_utils import with_envrc
-
-    with with_envrc(envrc_path):
-        con = connect_env_private_key(database=database, schema=schema, **overrides)
-    return con
-
-
-def connect_env_keypair(
-    keypair, database=default_database, schema=default_schema, **overrides
-):
-    return connect_env_private_key(
-        private_key=keypair.private_str,
-        private_key_pwd=keypair.private_key_pwd,
-        database=database,
-        schema=schema,
-        **overrides,
-    )
+connect_env_password = functools.partial(
+    connect_env, authenticator=SnowflakeAuthenticator.password
+)
+connect_env_password_mfa = functools.partial(
+    connect_env, authenticator=SnowflakeAuthenticator.mfa
+)
+connect_env_keypair = functools.partial(
+    connect_env, authenticator=SnowflakeAuthenticator.keypair
+)
 
 
 def con_to_adbc_kwargs(
