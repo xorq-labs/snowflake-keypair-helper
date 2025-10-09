@@ -6,10 +6,10 @@ a library and cli tool for creating, managing and using keypairs to authenticate
 
 the information i was able to find was
 - dispered among various pages
-- does not demonstrate a "single way" to do things
-- and does not do so in pure python
+- does not demonstrate a unified way to do things
+- does not do so in pure python
 
-additionally, `adbc_driver_manager.dbapi.Connection` requires a different type of key (encrypted, DER encoded) than `SnowflakeConnection` (unencrypted, PEM encoded)
+additionally, `adbc_driver_manager.dbapi.Connection` requires a different encoding (encrypted, DER encoded) than `SnowflakeConnection` (unencrypted, PEM encoded) and how to do the conversion is not easily discoverable
 
 # how?
 
