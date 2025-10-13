@@ -2,11 +2,7 @@ import functools
 import os
 from enum import Enum
 
-import adbc_driver_snowflake.dbapi as dbapi
 import toolz
-from adbc_driver_snowflake import (
-    DatabaseOptions,
-)
 
 from snowflake_keypair_helper.constants import (
     default_database,
@@ -162,6 +158,9 @@ def con_to_adbc_kwargs(
     def make_db_kwargs(con):
         is_keypair_auth = (con._authenticator or "").upper() == "SNOWFLAKE_JWT"
         if is_keypair_auth:
+            from adbc_driver_snowflake import (
+                DatabaseOptions,
+            )
             from snowflake_keypair_helper.crypto_utils import SnowflakeKeypair
 
             # we know the private key is unencrypted DER format
@@ -183,6 +182,8 @@ def con_to_adbc_kwargs(
 
 
 def con_to_adbc_con(con):
+    import adbc_driver_snowflake.dbapi as dbapi
+
     adbc_kwargs = con_to_adbc_kwargs(con)
     return dbapi.connect(**adbc_kwargs)
 

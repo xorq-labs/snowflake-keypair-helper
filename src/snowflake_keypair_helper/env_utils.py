@@ -3,7 +3,6 @@ import contextlib
 import itertools
 import re
 import shlex
-from unittest import mock
 from pathlib import Path
 
 
@@ -49,6 +48,8 @@ def parse_env_file(env_file, compiled_re=compiled_env_var_setting_re):
 @contextlib.contextmanager
 def with_environ(dct, clear=False):
     # https://stackoverflow.com/a/51754362
+    from unittest import mock
+
     with mock.patch.dict(os.environ, dct, clear=clear):
         yield
 
@@ -56,5 +57,5 @@ def with_environ(dct, clear=False):
 @contextlib.contextmanager
 def with_envrc(envrc_path, clear=False):
     dct = parse_env_file(envrc_path)
-    with mock.patch.dict(os.environ, dct, clear=clear):
+    with with_environ(dct, clear=clear):
         yield
