@@ -7,9 +7,6 @@ import toolz
 from adbc_driver_snowflake import (
     DatabaseOptions,
 )
-from snowflake.connector import (
-    connect,
-)
 
 from snowflake_keypair_helper.constants import (
     default_database,
@@ -114,6 +111,9 @@ def connect_env(
     envrc_path=os.devnull,
     **overrides,
 ):
+    from snowflake.connector import (
+        connect,
+    )
     from snowflake_keypair_helper.crypto_utils import (
         maybe_decrypt_private_key_snowflake,
     )
