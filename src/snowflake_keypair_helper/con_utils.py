@@ -156,7 +156,9 @@ def con_to_adbc_kwargs(
         return uri
 
     def make_db_kwargs(con):
-        is_keypair_auth = (con._authenticator or "").upper() == "SNOWFLAKE_JWT"
+        is_keypair_auth = (
+            con._authenticator or ""
+        ).upper() == SnowflakeAuthenticator.keypair.upper()
         if is_keypair_auth:
             from adbc_driver_snowflake import (
                 DatabaseOptions,
