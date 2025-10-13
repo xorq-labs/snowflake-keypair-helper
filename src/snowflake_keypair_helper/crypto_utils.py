@@ -2,6 +2,9 @@ from cryptography.hazmat.primitives.serialization import (
     Encoding,
 )
 
+from snowflake_keypair_helper.enums import (
+    SnowflakeFields,
+)
 from snowflake_keypair_helper.general_utils import (
     encode_utf8,
     make_private_key_pwd,
@@ -32,19 +35,25 @@ def maybe_decrypt_private_key_snowflake(kwargs: dict):
     # ProgrammingError: 251008: Failed to decode private key: Incorrect padding
     # Please provide a valid unencrypted rsa private key in base64-encoded DER format as a str object
     match kwargs:
-        case {"private_key": private_key, "private_key_pwd": private_key_pwd, **rest}:
+        case {
+            SnowflakeFields.private_key: private_key,
+            SnowflakeFields.private_key_pwd: private_key_pwd,
+            **rest,
+        }:
             assert isinstance(private_key, str)
             kwargs = rest | {
-                "private_key": decrypt_private_bytes_snowflake(
+                SnowflakeFields.private_key: decrypt_private_bytes_snowflake(
                     encode_utf8(private_key), private_key_pwd
                 )
             }
-        case {"private_key": private_key, **rest}:
+        case {SnowflakeFields.private_key: private_key, **rest}:
             assert isinstance(private_key, bytes)
             # ctor will fail if other than unencrypted DER format (bytes)
             SnowflakeKeypair.from_bytes_der(private_key)
         case _:
-            raise ValueError(f"`private_key` not found in kwargs: {tuple(kwargs)}")
+            raise ValueError(
+                f"`{SnowflakeFields.private_key}` not found in kwargs: {tuple(kwargs)}"
+            )
     return kwargs
 
 

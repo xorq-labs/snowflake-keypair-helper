@@ -1,6 +1,5 @@
 import functools
 import os
-from enum import Enum
 
 import toolz
 
@@ -9,37 +8,14 @@ from snowflake_keypair_helper.constants import (
     default_schema,
     snowflake_env_var_prefix,
 )
+from snowflake_keypair_helper.enums import (
+    SnowflakeAuthenticator,
+    SnowflakeFields,
+    SnowflakeEnvFields,
+)
 from snowflake_keypair_helper.env_utils import (
     with_env_path,
 )
-
-
-try:
-    from enum import StrEnum
-except ImportError:
-    from strenum import StrEnum
-
-
-class SnowflakeAuthenticator(StrEnum):
-    # https://docs.snowflake.com/en/developer-guide/node-js/nodejs-driver-options#label-nodejs-auth-options
-    password = "none"
-    mfa = "username_password_mfa"
-    keypair = "snowflake_jwt"
-    sso = "externalbrowser"
-
-
-class SnowflakeEnvFields(Enum):
-    password = (
-        "user",
-        "password",
-    )
-    mfa = (
-        "user",
-        "password",
-    )
-    keypair = ("user", "private_key", "private_key_pwd")
-    sso = ("user",)
-    connection = ("account", "role", "warehouse")
 
 
 def make_env_name(name, prefix=snowflake_env_var_prefix):
@@ -82,7 +58,7 @@ get_connection_defaults = toolz.curry(
 def maybe_process_keypair(kwargs):
     match kwargs:
         case {
-            "authenticator": SnowflakeAuthenticator.keypair,
+            SnowflakeFields.authenticator: SnowflakeAuthenticator.keypair,
             "keypair": keypair,
             **rest,
         }:
@@ -90,9 +66,9 @@ def maybe_process_keypair(kwargs):
             # if kwargs.get("private_key") or kwargs.get("private_key_pwd"):
             #     raise ValueError("cannot pass private_key or private_key_pwd when passing keypair")
             kwargs = rest | {
-                "authenticator": SnowflakeAuthenticator.keypair,
-                "private_key": keypair.private_str,
-                "private_key_pwd": keypair.private_key_pwd,
+                SnowflakeFields.authenticator: SnowflakeAuthenticator.keypair,
+                SnowflakeFields.private_key: keypair.private_str,
+                SnowflakeFields.private_key_pwd: keypair.private_key_pwd,
             }
         case _:
             pass
@@ -118,7 +94,10 @@ def connect_env(
         kwargs = (
             get_connection_defaults()
             | get_authenticator_credentials(authenticator)
-            | {"passcode": passcode, "authenticator": authenticator}
+            | {
+                SnowflakeFields.passcode: passcode,
+                SnowflakeFields.authenticator: authenticator,
+            }
             | overrides
         )
     kwargs = maybe_process_keypair(kwargs)
@@ -143,16 +122,24 @@ def con_to_adbc_kwargs(
 ):
     def make_uri(con, database, schema, **uri_overrides):
         params = (
-            {attr: getattr(con, attr) for attr in ("user", "host", "warehouse", "role")}
+            {
+                attr: getattr(con, attr)
+                for attr in (
+                    SnowflakeFields.user,
+                    SnowflakeFields.host,
+                    SnowflakeFields.warehouse,
+                    SnowflakeFields.role,
+                )
+            }
             | {
                 # ADBC connection always requires a password, even if using private key
-                "password": con._password or "nopassword",
-                "database": database,
-                "schema": schema,
+                SnowflakeFields.password: con._password or "nopassword",
+                SnowflakeFields.database: database,
+                SnowflakeFields.schema: schema,
             }
             | uri_overrides
         )
-        uri = f"{params['user']}:{params['password']}@{params['host']}/{params['database']}/{params['schema']}?warehouse={params['warehouse']}&role={params['role']}"
+        uri = f"{params[SnowflakeFields.user]}:{params[SnowflakeFields.password]}@{params[SnowflakeFields.host]}/{params[SnowflakeFields.database]}/{params[SnowflakeFields.schema]}?{SnowflakeFields.warehouse}={params[SnowflakeFields.warehouse]}&{SnowflakeFields.role}={params[SnowflakeFields.role]}"
         return uri
 
     def make_db_kwargs(con):
