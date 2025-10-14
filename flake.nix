@@ -78,10 +78,23 @@
         in
         pkgs.nixfmt-tree
       );
+      lib = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          pythonSet = pythonSets.${system}.overrideScope editableOverlay;
+          virtualenv = pythonSet.mkVirtualEnv "snowflake-keypair-helper-dev-env" workspace.deps.all;
+        in {
+          inherit
+            pkgs
+            pythonSet
+            virtualenv;
+        }
+      );
       apps = forAllSystems (
         system:
         let
-          pythonSet = pythonSets.${system}.overrideScope editableOverlay;
+          pythonSet = pythonSets.${system};
           virtualenv = pythonSet.mkVirtualEnv "snowflake-keypair-helper-dev-env" workspace.deps.all;
           inherit (nix-utils.lib.${system}.utils) drvToApp;
         in
