@@ -24,6 +24,7 @@ def do_popen_communicate(*args, do_decode=True):
     return (popened.returncode, out.decode("ascii"), err.decode("ascii"), popened)
 
 
+@pytest.mark.benchmark
 @pytest.mark.parametrize("command", all_cli_command_names)
 def test_cli_helps(command, tmp_path):
     (returncode, out, err, _) = do_popen_communicate(command, "--help")
@@ -33,6 +34,7 @@ def test_cli_helps(command, tmp_path):
     assert out.startswith(f"Usage: {command} ")
 
 
+@pytest.mark.benchmark
 def test_cli_generate_keypair_path(tmp_path, monkeypatch):
     # writes to cwd, not stdout/stderr
     monkeypatch.chdir(tmp_path)
@@ -44,8 +46,10 @@ def test_cli_generate_keypair_path(tmp_path, monkeypatch):
     (path, *rest) = tmp_path.iterdir()
     assert not rest
     assert path.name == name
+    path.unlink()
 
 
+@pytest.mark.benchmark
 def test_cli_generate_keypair_stdout(tmp_path, monkeypatch):
     # writes to stdout, not cwd/stderr
     monkeypatch.chdir(tmp_path)
@@ -59,8 +63,10 @@ def test_cli_generate_keypair_stdout(tmp_path, monkeypatch):
     dct = parse_env_file(path)
     assert dct
     assert all(key.startswith(snowflake_env_var_prefix) for key in dct)
+    path.unlink()
 
 
+@pytest.mark.benchmark
 def test_cli_list_cli_commands(tmp_path, monkeypatch):
     # writes to stdout, not cwd/stderr
     monkeypatch.chdir(tmp_path)

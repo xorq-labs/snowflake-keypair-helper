@@ -40,10 +40,12 @@ dev = [
 ]
 test = [
     "pytest>=8.4.2",
+    "pytest-codspeed>=4.1.1",
 ]
 
 [tool.pytest.ini_options]
 markers = [
     "needs_gh_test_role_access",
+    "benchmark",
 ]
 addopts = "--pdbcls=IPython.terminal.debugger:TerminalPdb"

@@ -1,0 +1,45 @@
+name: codspeed
+
+on:
+  push:
+    branches:
+      - main # Run on pushes to the main branch
+  pull_request: # Run on all pull requests
+
+jobs:
+  codspeed:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [ x86_64 ]
+        python-version: [ "3.12" ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: extractions/setup-just@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install the project
+        run: uv sync --all-extras --all-groups
+        working-directory: ${{ github.workspace }}
+
+      - uses: CodSpeedHQ/action@v3
+        with:
+          run: uv run --no-sync pytest --import-mode=importlib --codspeed
+          token: ${{ secrets.CODSPEED_TOKEN }}
+          working-directory: ${{ github.workspace }}
+        env:
+          SNOWFLAKE_PUBLIC_KEY: ${{ secrets.SNOWFLAKE_PUBLIC_KEY }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          SNOWFLAKE_PRIVATE_KEY_PWD: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PWD }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+          SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
