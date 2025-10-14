@@ -1,0 +1,21 @@
+name: ci-test-nix
+on:
+  pull_request:
+  push:
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        github_access_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: cachix/cachix-action@v31
+       with:
+         name: mycache
+         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+         extraPullNames: nix-community
+    - run: nix build --no-link
+    - run: nix flake check
+    - run: nix run .#list-cli-commands
+    - run: nix run .#generate-keypair -
