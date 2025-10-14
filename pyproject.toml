@@ -46,5 +46,6 @@ test = [
 [tool.pytest.ini_options]
 markers = [
     "needs_gh_test_role_access",
+    "benchmark",
 ]
 addopts = "--pdbcls=IPython.terminal.debugger:TerminalPdb"
