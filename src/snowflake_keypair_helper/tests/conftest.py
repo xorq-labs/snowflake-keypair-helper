@@ -21,6 +21,5 @@ have_gh_test_role_access = get_have_role_access(user=gh_user, role=gh_test_role)
 
 def pytest_runtest_setup(item):
     if any(mark.name == "needs_gh_test_role_access" for mark in item.iter_markers()):
-        # pytest.importorskip("snowflake.connector") # do this for adbc?
         if not have_gh_test_role_access:
             pytest.skip("cannot run X without Y")
