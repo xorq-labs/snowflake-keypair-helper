@@ -85,6 +85,20 @@ writing the variables to an env file (`"$TEST_USER".envrc`), using the developer
 
 ---
 
+# uv
+
+you can drop into an ipython environment (non-editable install of the last pypi release) with
+```
+uv run --isolated --with snowflake-keypair-helper,ipython ipython
+```
+
+each [`project.scripts`](https://github.com/xorq-labs/snowflake-keypair-helper/blob/main/pyproject.toml#L31-L34) entry is available as well
+```
+uv run --isolated --with snowflake-keypair-helper list-cli-commands
+```
+
+---
+
 # nix
 
 you can drop into an ipython environment (non-editable install of the current `main`) with
@@ -92,7 +106,7 @@ you can drop into an ipython environment (non-editable install of the current `m
 nix run github:xorq-labs/snowflake-keypair-helper
 ```
 
-each [`project.scripts`](https://github.com/xorq-labs/snowflake-keypair-helper/blob/main/pyproject.toml#L28-L32) entry is available as well
+each [`project.scripts`](https://github.com/xorq-labs/snowflake-keypair-helper/blob/main/pyproject.toml#L31-L34) entry is available as well
 ```
-nix run github:xorq-labs/snowflake-keypair-helper#generate-keypair
+nix run github:xorq-labs/snowflake-keypair-helper#list-cli-commands
 ```
