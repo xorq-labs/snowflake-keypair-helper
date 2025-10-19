@@ -101,28 +101,28 @@ con = connect_env_keypair(env_path="alice.user.env")
 .env files are simple KEY=VALUE files. they are convenient because:
 
 - the CLI can read them with `--env-path` to fill in missing `SNOWFLAKE_*` values temporarily.
-- if you use [direnv], you can `source_env` them to export variables in your shell automatically.
+- if you use [direnv](https://direnv.net/), you can `source_env` them to export variables in your shell automatically.
 
 **important:** you should not commit secret-bearing files; keep them in `.gitignore` and restrict permissions.
 
 #### example .env (developer defaults, non-secret)
 
 ```bash
-export SNOWFLAKE_ACCOUNT="xy12345.us-east-1"
-export SNOWFLAKE_WAREHOUSE="COMPUTE_WH"
-export SNOWFLAKE_DATABASE="ANALYTICS"
-export SNOWFLAKE_SCHEMA="PUBLIC"
-export SNOWFLAKE_ROLE="PUBLIC"
+SNOWFLAKE_ACCOUNT="xy12345.us-east-1"
+SNOWFLAKE_WAREHOUSE="COMPUTE_WH"
+SNOWFLAKE_DATABASE="ANALYTICS"
+SNOWFLAKE_SCHEMA="PUBLIC"
+SNOWFLAKE_ROLE="PUBLIC"
 ```
 
 #### example .env.secrets.snowflake.admin (admin creds)
 
 ```bash
 # Admin identity that can set PUBLIC_KEY on users
-export SNOWFLAKE_USER="admin_user"
-export SNOWFLAKE_ROLE="ACCOUNTADMIN" # or "ORGADMIN"/"USERADMIN"
-# export SNOWFLAKE_PRIVATE_KEY="<encrypted private key PEM block>"
-# export SNOWFLAKE_PUBLIC_KEY="<corresponding public key PEM block>"
+SNOWFLAKE_USER="admin_user"
+SNOWFLAKE_ROLE="ACCOUNTADMIN" # or "ORGADMIN"/"USERADMIN"
+# SNOWFLAKE_PRIVATE_KEY="<encrypted private key PEM block>"
+# SNOWFLAKE_PUBLIC_KEY="<corresponding public key PEM block>"
 ```
 
 ---
@@ -130,16 +130,16 @@ export SNOWFLAKE_ROLE="ACCOUNTADMIN" # or "ORGADMIN"/"USERADMIN"
 ### as a developer, generate a new keypair and password
 
 ```bash
-generate-keypair my-user
+generate-keypair my-keypair.env
 ```
 
-the keypair is serialized to disk in a file named `my-user`. after this, you can share the public key with your snowflake user admin to assign to your user.
+the keypair is serialized to disk in a file named `my-keypair.env`. after this, you can share the public key with your snowflake user admin to assign to your user.
 
 ### as a Snowflake admin, assign a public key from a file
 
 ```bash
 # file should set a variable named SNOWFLAKE_PUBLIC_KEY
-assign-public-key "$SNOWFLAKE_USER" --path "$SNOWFLAKE_ENVRC"
+assign-public-key "$SNOWFLAKE_USER" --path "$SNOWFLAKE_ENV_FILE"
 ```
 
 ### as a Snowflake admin, assign a public key from an environment variable
@@ -156,7 +156,7 @@ if you need to supplement your environment variables, you can pass `--env-path` 
 ### as a developer, generate and assign a new keypair
 
 ```bash
-path="$TEST_USER".env
+path="$TEST_USER.env"
 generate-keypair "$path"
 assign-public-key \
     "$TEST_USER" \
@@ -164,7 +164,7 @@ assign-public-key \
     --env-path .env.secrets.snowflake.keypair
 ```
 
-writing the variables to an env file (`"$TEST_USER".env`), using the developer's credentials loaded from disk (`.env.secrets.snowflake.keypair`). this is handy for users meant only for testing.
+writing the variables to an env file (`"$TEST_USER.env"`), using the developer's credentials loaded from disk (`.env.secrets.snowflake.keypair`). this is handy for users meant only for testing.
 
 ### as a developer, connect with the keypair variables you've populated to environment variables
 
