@@ -55,6 +55,9 @@ nix run github:xorq-labs/snowflake-keypair-helper#skh-list-cli-commands
 ### Option 3: run directly from uv
 ```
 uv run --isolated --with snowflake-keypair-helper skh-list-cli-commands
+
+# or run from the repo for features not yet published to pypi
+uv run --isolated --with git+https://github.com/xorq-labs/snowflake-keypair-helper skh-list-cli-commands
 ```
 
 ### Option 4: Initialize an environment with uv
