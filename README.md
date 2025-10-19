@@ -81,31 +81,31 @@ and cd into it:
 then, generate a keypair and assign it to a user:
 
 ```bash
-generate-keypair alice.user.envrc
-assign-public-key alice --path alice.user.envrc # alice is snowflake user name and assumes admin role
+generate-keypair alice.user.env
+assign-public-key alice --path alice.user.env # alice is snowflake user name and assumes admin role
 ```
 
 and then, connect using the keypair you've created:
 
 ```python
 from snowflake_keypair_helper import connect_env_keypair
-con = connect_env_keypair(envrc_path="alice.user.envrc")
+con = connect_env_keypair(env_path="alice.user.env")
 ```
 
 ---
 
 ## examples
 
-### understanding .envrc files
+### understanding .env files
 
-.envrc files are simple KEY=VALUE files. they are convenient because:
+.env files are simple KEY=VALUE files. they are convenient because:
 
-- the CLI can read them with `--envrc-path` to fill in missing `SNOWFLAKE_*` values temporarily.
+- the CLI can read them with `--env-path` to fill in missing `SNOWFLAKE_*` values temporarily.
 - if you use [direnv], you can `source_env` them to export variables in your shell automatically.
 
 **important:** you should not commit secret-bearing files; keep them in `.gitignore` and restrict permissions.
 
-#### example .envrc (developer defaults, non-secret)
+#### example .env (developer defaults, non-secret)
 
 ```bash
 export SNOWFLAKE_ACCOUNT="xy12345.us-east-1"
@@ -115,7 +115,7 @@ export SNOWFLAKE_SCHEMA="PUBLIC"
 export SNOWFLAKE_ROLE="PUBLIC"
 ```
 
-#### example .envrc.secrets.snowflake.admin (admin creds)
+#### example .env.secrets.snowflake.admin (admin creds)
 
 ```bash
 # Admin identity that can set PUBLIC_KEY on users
@@ -151,20 +151,20 @@ assign-public-key -- "$USER" --public_key_str "$USER_PUBLIC_KEY"
 
 the connection created to assign the public key gets its arguments from your environment variables, which default to `SNOWFLAKE_` prefixed variable names like `SNOWFLAKE_USER`.
 
-if you need to supplement your environment variables, you can pass `--envrc-path` which is a path parsed for environment variables and temporarily added to the environment during the invocation (see below).
+if you need to supplement your environment variables, you can pass `--env-path` which is a path parsed for environment variables and temporarily added to the environment during the invocation (see below).
 
 ### as a developer, generate and assign a new keypair
 
 ```bash
-path="$TEST_USER".envrc
+path="$TEST_USER".env
 generate-keypair "$path"
 assign-public-key \
     "$TEST_USER" \
     --path "$path" \
-    --envrc-path .envrc.secrets.snowflake.keypair
+    --env-path .env.secrets.snowflake.keypair
 ```
 
-writing the variables to an env file (`"$TEST_USER".envrc`), using the developer's credentials loaded from disk (`.envrc.secrets.snowflake.keypair`). this is handy for users meant only for testing.
+writing the variables to an env file (`"$TEST_USER".env`), using the developer's credentials loaded from disk (`.env.secrets.snowflake.keypair`). this is handy for users meant only for testing.
 
 ### as a developer, connect with the keypair variables you've populated to environment variables
 
@@ -181,7 +181,7 @@ from snowflake_keypair_helper.api import (
     connect_env_keypair,
 )
 
-con = connect_env_keypair(envrc_path="my-keypair.env")
+con = connect_env_keypair(env_path="my-keypair.env")
 ```
 
 ---

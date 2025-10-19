@@ -118,9 +118,9 @@ def test_ecrypted_roundtrip(encoding, ctor):
     assert keypair0 == keypair1
 
 
-def test_roundtrip_envrc(tmp_path):
+def test_roundtrip_env_path(tmp_path):
     env_path = tmp_path.joinpath(".env")
     expected = SnowflakeKeypair.generate()
-    expected.to_envrc(env_path)
-    actual = SnowflakeKeypair.from_envrc(env_path)
+    expected.to_env_path(env_path)
+    actual = SnowflakeKeypair.from_env_path(env_path)
     assert actual == expected
