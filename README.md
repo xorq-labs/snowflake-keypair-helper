@@ -11,20 +11,13 @@ enrollment by default for human users. more info in [snowflake
 docs](https://docs.snowflake.com/en/release-notes/bcr-bundles/2024_08/bcr-1784)
 
 additionally, the information i was able to find was:
-
-dispered among various pages
-does not demonstrate a unified way to do things
-does not do so in pure python
-
-finally, adbc_driver_manager.dbapi.Connection requires a different encoding
-(encrypted, DER encoded) than SnowflakeConnection (unencrypted, PEM encoded)
-and how to do the conversion is not easily discoverable.
-the information i was able to find was:
 - dispered among various pages
 - does not demonstrate a unified way to do things
 - does not do so in pure python
 
-additionally, `adbc_driver_manager.dbapi.Connection` requires a different encoding (encrypted, DER encoded) than `SnowflakeConnection` (unencrypted, PEM encoded) and how to do the conversion is not easily discoverable.
+finally, adbc_driver_manager.dbapi.Connection requires a different encoding
+(encrypted, DER encoded) than SnowflakeConnection (unencrypted, PEM encoded)
+and how to do the conversion is not easily discoverable.
 
 ## how?
 
@@ -59,7 +52,12 @@ list-cli-commands         # list all commands available from this cli (snowflake
 nix run github:xorq-labs/snowflake-keypair-helper#list-cli-commands
 ```
 
-### Option 3: Initialize an environment with uv
+### Option 3: run directly from uv
+```
+uv run --isolated --with snowflake-keypair-helper list-cli-commands
+```
+
+### Option 4: Initialize an environment with uv
 
 First, clone the repository:
 
