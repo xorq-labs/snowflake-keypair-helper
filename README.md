@@ -70,7 +70,7 @@ assign-public-key \
 ```
 writing the variables to an env file (`"$TEST_USER".envrc`), using the developer's credentials loaded from disk (`.envrc.secrets.snowflake.keypair`). this is handy for users meant only for testing
 
-### as a developer, connect with the keypair you've created with environment variables
+### as a developer, connect with the keypair variables you've populated to environment variables
 ```
 from snowflake_keypair_helper import connect_env_keypair
 
