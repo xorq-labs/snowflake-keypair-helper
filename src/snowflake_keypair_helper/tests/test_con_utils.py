@@ -81,8 +81,8 @@ def test_connect_env_private_key_from_keypair_both_ways(keypair_from_env):
 def test_assign_deassign_public_key(con, tmp_path):
     user = gh_test_user
     keypair = SnowflakeKeypair.generate()
-    path = tmp_path.joinpath(f"{user}.envrc")
-    keypair.to_envrc(path)
+    path = tmp_path.joinpath(f"{user}.env")
+    keypair.to_env_path(path)
     assign_public_key(con, user, keypair.public_str)
     gh_test_user_con = connect_env_keypair(keypair=keypair, user=user)
     assert gh_test_user_con.user == user

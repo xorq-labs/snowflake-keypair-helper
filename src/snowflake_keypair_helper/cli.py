@@ -64,7 +64,7 @@ def generate_keypair(
 ):
     path = None if path == "-" else Path(path)
     keypair = SnowflakeKeypair.generate(password=password)
-    path = keypair.to_envrc(path=path, prefix=prefix, encrypted=encrypted)
+    path = keypair.to_env_path(path=path, prefix=prefix, encrypted=encrypted)
     return path
 
 
@@ -72,18 +72,18 @@ def generate_keypair(
 @click.argument("user")
 @click.option("--public_key_str", default=None)
 @click.option("--path", default=None)
-@click.option("--envrc-path", default=devnull)
-def assign_public_key(user, public_key_str=None, path=None, envrc_path=devnull):
+@click.option("--env-path", default=devnull)
+def assign_public_key(user, public_key_str=None, path=None, env_path=devnull):
     public_key_str = arbitrate_public_key(public_key_str=public_key_str, path=path)
-    con = connect_env(envrc_path=envrc_path)
+    con = connect_env(env_path=env_path)
     _assign_public_key(con, user, public_key_str, assert_value=True)
 
 
 @click.command(help="create a user")
 @click.argument("user")
-@click.option("--envrc-path", default=devnull)
-def create_user(user, envrc_path=devnull):
-    con = connect_env(envrc_path=envrc_path)
+@click.option("--env-path", default=devnull)
+def create_user(user, env_path=devnull):
+    con = connect_env(env_path=env_path)
     _create_user(con, user)
 
 

@@ -182,7 +182,7 @@ class SnowflakeKeypair:
     def with_password(self, private_key_pwd):
         return replace(self, private_key_pwd=private_key_pwd)
 
-    def to_envrc(
+    def to_env_path(
         self,
         path: Optional[Path] = default_path,
         prefix: str = prefix,
@@ -268,8 +268,8 @@ class SnowflakeKeypair:
         return cls.from_str_pem(**kwargs)
 
     @classmethod
-    def from_envrc(cls, path=default_path, prefix=prefix):
-        from snowflake_keypair_helper.env_utils import parse_env_file
+    def from_env_path(cls, path=default_path, prefix=prefix):
+        from snowflake_keypair_helper.env_utils import parse_env_path
 
-        ctx = parse_env_file(path)
+        ctx = parse_env_path(path)
         return cls.from_environment(ctx=ctx, prefix=prefix)

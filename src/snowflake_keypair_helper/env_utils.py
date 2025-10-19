@@ -12,7 +12,7 @@ compiled_env_var_setting_re = re.compile(
 )
 
 
-def parse_env_file(env_file, compiled_re=compiled_env_var_setting_re):
+def parse_env_path(env_path, compiled_re=compiled_env_var_setting_re):
     def gen_shlex_lines(path):
         def make_lexer(path):
             lex = shlex.shlex(Path(path).read_text(), posix=True)
@@ -39,7 +39,7 @@ def parse_env_file(env_file, compiled_re=compiled_env_var_setting_re):
 
     matches = map(
         compiled_re.match,
-        gen_shlex_lines(env_file),
+        gen_shlex_lines(env_path),
     )
     dct = dict(match.groups() for match in filter(None, matches))
     return dct
@@ -55,7 +55,7 @@ def with_environ(dct, clear=False):
 
 
 @contextlib.contextmanager
-def with_envrc(envrc_path, clear=False):
-    dct = parse_env_file(envrc_path)
+def with_env_path(env_path, clear=False):
+    dct = parse_env_path(env_path)
     with with_environ(dct, clear=clear):
         yield

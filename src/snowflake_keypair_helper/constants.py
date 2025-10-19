@@ -6,7 +6,7 @@ snowflake_env_var_prefix = "SNOWFLAKE_"
 
 default_database = "SNOWFLAKE_SAMPLE_DATA"
 default_schema = "TPCH_SF1"
-default_env_path = Path(".envrc.secrets.snowflake.keypair")
+default_env_path = Path(".env.secrets.snowflake.keypair")
 default_warehouse = "COMPUTE_WH"
 
 

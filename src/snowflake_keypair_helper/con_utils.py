@@ -10,7 +10,7 @@ from snowflake_keypair_helper.constants import (
     snowflake_env_var_prefix,
 )
 from snowflake_keypair_helper.env_utils import (
-    with_envrc,
+    with_env_path,
 )
 
 
@@ -104,7 +104,7 @@ def connect_env(
     database=default_database,
     schema=default_schema,
     authenticator=SnowflakeAuthenticator.keypair,
-    envrc_path=os.devnull,
+    env_path=os.devnull,
     **overrides,
 ):
     from snowflake.connector import (
@@ -114,7 +114,7 @@ def connect_env(
         maybe_decrypt_private_key_snowflake,
     )
 
-    with with_envrc(envrc_path):
+    with with_env_path(env_path):
         kwargs = (
             get_connection_defaults()
             | get_authenticator_credentials(authenticator)

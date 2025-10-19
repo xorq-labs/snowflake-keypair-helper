@@ -11,7 +11,7 @@ from snowflake_keypair_helper.constants import (
     snowflake_env_var_prefix,
 )
 from snowflake_keypair_helper.env_utils import (
-    parse_env_file,
+    parse_env_path,
 )
 
 
@@ -38,7 +38,7 @@ def test_cli_helps(command, tmp_path):
 def test_cli_generate_keypair_path(tmp_path, monkeypatch):
     # writes to cwd, not stdout/stderr
     monkeypatch.chdir(tmp_path)
-    name = "my.envrc"
+    name = "my.env"
     (returncode, out, err, _) = do_popen_communicate("generate-keypair", name)
     assert not returncode
     assert not err
@@ -58,9 +58,9 @@ def test_cli_generate_keypair_stdout(tmp_path, monkeypatch):
     assert not returncode
     assert not err
     assert not tuple(tmp_path.iterdir())
-    path = tmp_path.joinpath("my.envrc")
+    path = tmp_path.joinpath("my.env")
     path.write_text(out)
-    dct = parse_env_file(path)
+    dct = parse_env_path(path)
     assert dct
     assert all(key.startswith(snowflake_env_var_prefix) for key in dct)
     path.unlink()
