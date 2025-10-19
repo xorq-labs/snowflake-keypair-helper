@@ -103,21 +103,21 @@
             drv = virtualenv;
             name = "ipython";
           };
-          generate-keypair = drvToApp {
+          skh-generate-keypair = drvToApp {
             drv = virtualenv;
-            name = "generate-keypair";
+            name = "skh-generate-keypair";
           };
-          assign-public-key = drvToApp {
+          skh-assign-public-key = drvToApp {
             drv = virtualenv;
-            name = "assign-public-key";
+            name = "skh-assign-public-key";
           };
-          create-user = drvToApp {
+          skh-create-user = drvToApp {
             drv = virtualenv;
-            name = "create-user";
+            name = "skh-create-user";
           };
-          list-cli-commands = drvToApp {
+          skh-list-cli-commands = drvToApp {
             drv = virtualenv;
-            name = "list-cli-commands";
+            name = "skh-list-cli-commands";
           };
           default = self.apps.${system}.ipython;
         }

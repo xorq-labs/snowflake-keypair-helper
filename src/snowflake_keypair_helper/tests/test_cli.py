@@ -39,7 +39,7 @@ def test_cli_generate_keypair_path(tmp_path, monkeypatch):
     # writes to cwd, not stdout/stderr
     monkeypatch.chdir(tmp_path)
     name = "my.env"
-    (returncode, out, err, _) = do_popen_communicate("generate-keypair", name)
+    (returncode, out, err, _) = do_popen_communicate("skh-generate-keypair", name)
     assert not returncode
     assert not err
     assert not out
@@ -54,7 +54,7 @@ def test_cli_generate_keypair_stdout(tmp_path, monkeypatch):
     # writes to stdout, not cwd/stderr
     monkeypatch.chdir(tmp_path)
     name = "-"
-    (returncode, out, err, _) = do_popen_communicate("generate-keypair", name)
+    (returncode, out, err, _) = do_popen_communicate("skh-generate-keypair", name)
     assert not returncode
     assert not err
     assert not tuple(tmp_path.iterdir())
@@ -70,7 +70,7 @@ def test_cli_generate_keypair_stdout(tmp_path, monkeypatch):
 def test_cli_list_cli_commands(tmp_path, monkeypatch):
     # writes to stdout, not cwd/stderr
     monkeypatch.chdir(tmp_path)
-    (returncode, out, err, _) = do_popen_communicate("list-cli-commands")
+    (returncode, out, err, _) = do_popen_communicate("skh-list-cli-commands")
     assert not returncode
     assert not err
     assert not tuple(tmp_path.iterdir())

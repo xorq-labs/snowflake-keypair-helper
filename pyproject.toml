@@ -28,10 +28,10 @@ Repository = "https://github.com/xorq-labs/snowflake-keypair-helper/"
 Issues = "https://github.com/xorq-labs/snowflake-keypair-helper/issues"
 
 [project.scripts]
-generate-keypair = "snowflake_keypair_helper.cli:generate_keypair"
-assign-public-key = "snowflake_keypair_helper.cli:assign_public_key"
-create-user = "snowflake_keypair_helper.cli:create_user"
-list-cli-commands = "snowflake_keypair_helper.cli:list_cli_commands"
+skh-generate-keypair = "snowflake_keypair_helper.cli:skh_generate_keypair"
+skh-assign-public-key = "snowflake_keypair_helper.cli:skh_assign_public_key"
+skh-create-user = "snowflake_keypair_helper.cli:skh_create_user"
+skh-list-cli-commands = "snowflake_keypair_helper.cli:skh_list_cli_commands"
 
 [dependency-groups]
 dev = [

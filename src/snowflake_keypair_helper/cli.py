@@ -56,7 +56,7 @@ def gen_commands():
 @click.option("--password", default=None)
 @click.option("--prefix", default=snowflake_env_var_prefix)
 @click.option("--encrypted/--no-encrypted", default=True)
-def generate_keypair(
+def skh_generate_keypair(
     path,
     password=None,
     prefix=snowflake_env_var_prefix,
@@ -73,7 +73,7 @@ def generate_keypair(
 @click.option("--public_key_str", default=None)
 @click.option("--path", default=None)
 @click.option("--env-path", default=devnull)
-def assign_public_key(user, public_key_str=None, path=None, env_path=devnull):
+def skh_assign_public_key(user, public_key_str=None, path=None, env_path=devnull):
     public_key_str = arbitrate_public_key(public_key_str=public_key_str, path=path)
     con = connect_env(env_path=env_path)
     _assign_public_key(con, user, public_key_str, assert_value=True)
@@ -82,13 +82,13 @@ def assign_public_key(user, public_key_str=None, path=None, env_path=devnull):
 @click.command(help="create a user")
 @click.argument("user")
 @click.option("--env-path", default=devnull)
-def create_user(user, env_path=devnull):
+def skh_create_user(user, env_path=devnull):
     con = connect_env(env_path=env_path)
     _create_user(con, user)
 
 
 @click.command(help=f"list all commands available from this cli ({__package__})")
-def list_cli_commands():
+def skh_list_cli_commands():
     print(
         "\n".join(
             f"{command.name}: {command.help if command.help else 'no help string specified'}"
