@@ -40,21 +40,24 @@ pip install snowflake-keypair-helper
 Use the CLI tool:
 
 ```bash
-generate-keypair          # generate a new keypair and write it to disk
-assign-public-key         # assign a public key to a user
-create-user               # create a user
-list-cli-commands         # list all commands available from this cli (snowflake_keypair_helper)
+skh-generate-keypair          # generate a new keypair and write it to disk
+skh-assign-public-key         # assign a public key to a user
+skh-create-user               # create a user
+skh-list-cli-commands         # list all commands available from this cli (snowflake_keypair_helper)
 ```
 
 ### Option 2: Run via nix
 
 ```bash
-nix run github:xorq-labs/snowflake-keypair-helper#list-cli-commands
+nix run github:xorq-labs/snowflake-keypair-helper#skh-list-cli-commands
 ```
 
 ### Option 3: run directly from uv
 ```
-uv run --isolated --with snowflake-keypair-helper list-cli-commands
+uv run --isolated --with snowflake-keypair-helper skh-list-cli-commands
+
+# or run from the repo for features not yet published to pypi
+uv run --isolated --with git+https://github.com/xorq-labs/snowflake-keypair-helper skh-list-cli-commands
 ```
 
 ### Option 4: Initialize an environment with uv
@@ -75,7 +78,7 @@ and cd into it:
 ./with-uvenv uv run pre-commit install
 
 # Show available CLI commands from this package
-./with-uvenv uv run list-cli-commands
+./with-uvenv uv run skh-list-cli-commands
 ```
 
 then, generate a keypair and assign it to a user:
@@ -212,7 +215,7 @@ uv run --isolated --with snowflake-keypair-helper,ipython ipython
 each [`project.scripts`](https://github.com/xorq-labs/snowflake-keypair-helper/blob/main/pyproject.toml#L31-L34) entry is available as well:
 
 ```bash
-uv run --isolated --with snowflake-keypair-helper list-cli-commands
+uv run --isolated --with snowflake-keypair-helper skh-list-cli-commands
 ```
 
 ---
@@ -228,5 +231,5 @@ nix run github:xorq-labs/snowflake-keypair-helper
 each [`project.scripts`](https://github.com/xorq-labs/snowflake-keypair-helper/blob/main/pyproject.toml#L31-L34) entry is available as well:
 
 ```bash
-nix run github:xorq-labs/snowflake-keypair-helper#list-cli-commands
+nix run github:xorq-labs/snowflake-keypair-helper#skh-list-cli-commands
 ```
