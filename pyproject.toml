@@ -5,10 +5,10 @@ description = "A library for creating, managing and using keypairs to authentica
 requires-python = ">=3.10"
 dependencies = [
  "adbc-driver-snowflake>=1.8.0",
- "click>=8.3.0",
- "snowflake-connector-python>=3.17.4",
+ "click>=7.0.0",
+ "snowflake-connector-python>=3.17.3",
  "strenum>=0.4.15 ; python_full_version < '3.11'",
- "toolz>=1.0.0",
+ "toolz>=0.9.0",
 ]
 license = { file = "LICENSE" }
 authors = [
@@ -32,6 +32,11 @@ skh-generate-keypair = "snowflake_keypair_helper.cli:skh_generate_keypair"
 skh-assign-public-key = "snowflake_keypair_helper.cli:skh_assign_public_key"
 skh-create-user = "snowflake_keypair_helper.cli:skh_create_user"
 skh-list-cli-commands = "snowflake_keypair_helper.cli:skh_list_cli_commands"
+
+[project.optional-dependencies]
+snow = [
+ "snowflake-cli>=3.12.0",
+]
 
 [dependency-groups]
 dev = [

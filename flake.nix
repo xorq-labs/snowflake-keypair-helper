@@ -52,6 +52,14 @@
         root = "$REPO_ROOT";
       };
 
+      pyprojectOverrides = final: prev: {
+        toolz = prev.toolz.overrideAttrs (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem {
+            setuptools = [ ];
+          };
+        });
+      };
+
       pythonSets = forAllSystems (
         system:
         let
@@ -65,6 +73,7 @@
             lib.composeManyExtensions [
               pyproject-build-systems.overlays.wheel
               overlay
+              pyprojectOverrides
             ]
           )
       );
