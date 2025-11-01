@@ -37,6 +37,9 @@ skh-list-cli-commands = "snowflake_keypair_helper.cli:skh_list_cli_commands"
 snow = [
  "snowflake-cli>=3.12.0",
 ]
+snowpark = [
+ "snowflake-snowpark-python>=1.33.0",
+]
 
 [dependency-groups]
 dev = [
