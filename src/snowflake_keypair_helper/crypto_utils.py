@@ -1,5 +1,6 @@
 import os
 import random
+import re
 import string
 from dataclasses import (
     dataclass,
@@ -10,6 +11,7 @@ from pathlib import Path
 from typing import Optional
 
 import cryptography.hazmat.primitives.asymmetric.rsa as rsa
+import toolz
 from cryptography.hazmat.primitives.serialization import (
     BestAvailableEncryption,
     Encoding,
@@ -29,6 +31,11 @@ from snowflake_keypair_helper.dataclass_utils import (
 )
 
 
+HEADER_DASHES = "-----"
+BEGIN = "BEGIN"
+END = "END"
+
+
 def make_private_key_pwd(k=20, choices=string.ascii_letters + string.digits):
     return "".join(random.choices(choices, k=k))
 
@@ -42,17 +49,39 @@ def filter_none_one(el):
     return filter(None, (el,))
 
 
+def remove_delimiters(key_str):
+    def maybe_match(string):
+        return f"(?:{string})?"
+
+    def named_group(name, pattern):
+        return f"(?P<{name}>{pattern})"
+
+    def named_backreference(name):
+        return f"(?P={name})"
+
+    infix_name, infix_pattern = "infix", "[A-Z\\s]+?"
+    inner_text_name, inner_text_pattern = "inner_text", "[^-]+"
+    begin_pattern = f"{HEADER_DASHES}{BEGIN} {named_group(infix_name, infix_pattern)}{HEADER_DASHES}"
+    end_pattern = (
+        f"{HEADER_DASHES}{END} {named_backreference(infix_name)}{HEADER_DASHES}"
+    )
+    pattern = f"{maybe_match(begin_pattern)}{named_group(inner_text_name, inner_text_pattern)}{maybe_match(end_pattern)}"
+    match = re.match(pattern, key_str)
+    if match:
+        dct = match.groupdict()
+        inner_text = dct[inner_text_name]
+        infix = dct.get(infix_name)
+        return inner_text, infix
+    else:
+        raise ValueError("key_str does not match key-with-headers pattern")
+
+
 def remove_public_key_delimiters(public_key_str):
     # https://docs.snowflake.com/en/user-guide/key-pair-auth#assign-the-public-key-to-a-snowflake-user
     # # Note: Exclude the public key delimiters in the SQL statement.
-    sep = "\n"
-    (preamble, *lines, postamble) = public_key_str.strip().split(sep)
-    assert (preamble, postamble) == (
-        "-----BEGIN PUBLIC KEY-----",
-        "-----END PUBLIC KEY-----",
-    )
-    removed = sep.join(lines)
-    return removed
+    inner_text, infix = remove_delimiters(public_key_str)
+    assert infix == "PUBLIC KEY"
+    return inner_text
 
 
 def decrypt_private_bytes_snowflake(private_bytes: bytes, password_str: str):
@@ -119,6 +148,14 @@ def generate_private_str(password=None):
     return SnowflakeKeypair.generate(password=password).private_str
 
 
+def ensure_header_footer(key_str, private_key_pwd=None, infix="PRIVATE KEY"):
+    if not key_str.startswith(HEADER_DASHES):
+        header = f"{HEADER_DASHES}{BEGIN} {'ENCRYPTED ' if private_key_pwd else ''}{infix}{HEADER_DASHES}"
+        footer = f"{HEADER_DASHES}{END} {'ENCRYPTED ' if private_key_pwd else ''}{infix}{HEADER_DASHES}"
+        key_str = "\n".join((header, key_str, footer, ""))
+    return key_str
+
+
 @dataclass(frozen=True)
 class SnowflakeKeypair:
     private_key: rsa.RSAPrivateKey
@@ -182,13 +219,22 @@ class SnowflakeKeypair:
     def with_password(self, private_key_pwd):
         return replace(self, private_key_pwd=private_key_pwd)
 
-    def to_env_path(
+    def to_dict(
         self,
-        path: Optional[Path] = default_path,
         prefix: str = prefix,
         encrypted: bool = True,
+        oneline: bool = True,
     ):
         from snowflake_keypair_helper.con_utils import make_env_name
+
+        def make_oneline(string):
+            try:
+                string, _ = remove_delimiters(string)
+                string = re.sub("\\s", "", string)
+            except ValueError:
+                pass
+            assert "\n" not in string
+            return string
 
         names_fields = (
             (
@@ -202,20 +248,44 @@ class SnowflakeKeypair:
                 ("public_key", "public_str"),
             )
         )
-        text = "\n".join(
-            f"export {name}='{value}'"
-            for name, value in (
-                (
-                    make_env_name(name, prefix=prefix),
-                    getattr(self, field),
-                )
-                for (name, field) in names_fields
-            )
+        dct = {
+            make_env_name(name, prefix=prefix): getattr(self, field)
+            for (name, field) in names_fields
+        }
+        if oneline:
+            dct = toolz.valmap(make_oneline, dct)
+        return dct
+
+    def to_env_text(
+        self,
+        prefix: str = prefix,
+        encrypted: bool = True,
+        export: bool = False,
+        oneline: bool = True,
+    ):
+        env_text = "\n".join(
+            f"{'export ' if export else ''}{name}='{value}'"
+            for name, value in self.to_dict(
+                prefix=prefix, encrypted=encrypted, oneline=oneline
+            ).items()
+        )
+        return env_text
+
+    def to_env_path(
+        self,
+        path: Optional[Path] = default_path,
+        prefix: str = prefix,
+        encrypted: bool = True,
+        export: bool = False,
+        oneline: bool = True,
+    ):
+        env_text = self.to_env_text(
+            prefix=prefix, encrypted=encrypted, export=export, oneline=oneline
         )
         if path is None:
-            print(text)
+            print(env_text)
         else:
-            (path := Path(path)).write_text(text)
+            (path := Path(path)).write_text(env_text)
         return path
 
     @classmethod
@@ -250,7 +320,10 @@ class SnowflakeKeypair:
 
     @classmethod
     def from_str_pem(cls, private_str: str, private_key_pwd: Optional[str] = None):
-        return cls.from_bytes(encode_utf8(private_str), private_key_pwd)
+        encoded = encode_utf8(
+            ensure_header_footer(private_str, private_key_pwd=private_key_pwd)
+        )
+        return cls.from_bytes(encoded, private_key_pwd)
 
     from_str = from_str_pem
 

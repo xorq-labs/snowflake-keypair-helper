@@ -124,3 +124,23 @@ def test_roundtrip_env_path(tmp_path):
     expected.to_env_path(env_path)
     actual = SnowflakeKeypair.from_env_path(env_path)
     assert actual == expected
+
+
+@pytest.mark.parametrize("encrypted", (True, False))
+def test_oneline_dict(encrypted):
+    kp = SnowflakeKeypair.generate()
+    dct = kp.to_dict(encrypted=encrypted, oneline=True)
+    assert all("\n" not in v for v in dct.values())
+    other = SnowflakeKeypair.from_environment(dct).with_password(kp.private_key_pwd)
+    assert kp == other
+
+
+@pytest.mark.parametrize("encrypted", (True, False))
+def test_oneline_env_path(encrypted, tmp_path):
+    env_path = tmp_path.joinpath(".env")
+    kp = SnowflakeKeypair.generate()
+    kp.to_env_path(path=env_path, encrypted=encrypted, oneline=True)
+    other = SnowflakeKeypair.from_env_path(path=env_path).with_password(
+        kp.private_key_pwd
+    )
+    assert kp == other
