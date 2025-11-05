@@ -1,0 +1,5 @@
+source_env .envrc.nix-direnv
+
+watch_file pyproject.toml
+
+use flake
