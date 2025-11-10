@@ -78,7 +78,7 @@ class JWTGenerator:
     auth_url = field(
         validator=optional(instance_of(Text)), default=None, on_setattr=setters.NO_OP
     )
-    endpoint = field(
+    ingress_url = field(
         validator=optional(instance_of(Text)), default=None, on_setattr=setters.NO_OP
     )
     role = field(
@@ -136,10 +136,12 @@ class JWTGenerator:
             self.generate_token(now)
         return self.token
 
-    def get_jwt(self, auth_url, endpoint, role=None) -> Text:
+    def get_jwt(self, auth_url, ingress_url, role=None) -> Text:
         data = {
             "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-            "scope": endpoint if role is None else f"session:role:{role} {endpoint}",
+            "scope": ingress_url
+            if role is None
+            else f"session:role:{role} {ingress_url}",
             "assertion": self.get_token(),
         }
         response = requests.post(auth_url, data=data)
@@ -147,9 +149,11 @@ class JWTGenerator:
         assert 200 == response.status_code, "unable to get snowflake token"
         return response.text
 
-    def get_auth_headers(self, auth_url=None, endpoint=None, role=None) -> dict:
+    def get_auth_headers(self, auth_url=None, ingress_url=None, role=None) -> dict:
         jwt = self.get_jwt(
-            auth_url or self.auth_url, endpoint or self.endpoint, role=role or self.role
+            auth_url or self.auth_url,
+            ingress_url or self.ingress_url,
+            role=role or self.role,
         )
         headers = {"Authorization": f'Snowflake Token="{jwt}"'}
         return headers
