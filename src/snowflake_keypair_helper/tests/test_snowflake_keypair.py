@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.serialization import (
     # load_pem_private_key,
 )
 
-from snowflake_keypair_helper.crypto_utils import (
+from snowflake_keypair_helper.snowflake_keypair import (
     SnowflakeKeypair,
 )
 

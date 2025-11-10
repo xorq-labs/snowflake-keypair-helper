@@ -11,7 +11,7 @@ from snowflake_keypair_helper.con_utils import (
 from snowflake_keypair_helper.constants import (
     snowflake_env_var_prefix,
 )
-from snowflake_keypair_helper.crypto_utils import (
+from snowflake_keypair_helper.snowflake_keypair import (
     SnowflakeKeypair,
 )
 from snowflake_keypair_helper.init_state_utils import (
