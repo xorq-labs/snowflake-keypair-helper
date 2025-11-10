@@ -16,7 +16,7 @@ from snowflake_keypair_helper.constants import (
     gh_test_user,
     gh_user,
 )
-from snowflake_keypair_helper.crypto_utils import SnowflakeKeypair
+from snowflake_keypair_helper.snowflake_keypair import SnowflakeKeypair
 
 
 @pytest.fixture
