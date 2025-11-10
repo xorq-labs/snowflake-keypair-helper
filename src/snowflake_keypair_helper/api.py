@@ -7,6 +7,9 @@ from snowflake_keypair_helper.con_utils import (
     connect_env_keypair,
     deassign_public_key,
 )
+from snowflake_keypair_helper.jwt_generator import (
+    JWTGenerator,
+)
 from snowflake_keypair_helper.crypto_utils import (
     SnowflakeKeypair,
     decrypt_private_bytes_snowflake,
@@ -30,4 +33,6 @@ __all__ = [
     "decrypt_private_bytes_snowflake",
     "encrypt_private_bytes_snowflake_adbc",
     "generate_private_str",
+    # jwt_generator
+    "JWTGenerator",
 ]
