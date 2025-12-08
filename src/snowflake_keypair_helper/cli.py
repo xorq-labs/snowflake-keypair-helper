@@ -20,10 +20,10 @@ from snowflake_keypair_helper.init_state_utils import (
 
 
 def public_key_from_path(path, prefix=snowflake_env_var_prefix):
-    from snowflake_keypair_helper.env_utils import parse_env_file
+    from snowflake_keypair_helper.env_utils import parse_env_path
     from snowflake_keypair_helper.con_utils import make_env_name
 
-    dct = parse_env_file(path)
+    dct = parse_env_path(path)
     public_key = dct[make_env_name("PUBLIC_KEY", prefix=prefix)]
     return public_key
 
