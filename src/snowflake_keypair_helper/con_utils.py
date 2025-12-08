@@ -193,6 +193,7 @@ def adbc_ingest(
         conn.commit()
 
 
+@toolz.curry
 def execute_statements(con, statements):
     def make_dcts(cursor):
         return tuple(
