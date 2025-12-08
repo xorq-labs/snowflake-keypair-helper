@@ -24,7 +24,7 @@ def filter_none_one(el):
     return filter(None, (el,))
 
 
-def remove_delimiters(key_str):
+def ensure_no_delimiters(key_str):
     def maybe_match(string):
         return f"(?:{string})?"
 
@@ -54,7 +54,7 @@ def remove_delimiters(key_str):
 def remove_public_key_delimiters(public_key_str):
     # https://docs.snowflake.com/en/user-guide/key-pair-auth#assign-the-public-key-to-a-snowflake-user
     # # Note: Exclude the public key delimiters in the SQL statement.
-    inner_text, infix = remove_delimiters(public_key_str)
+    inner_text, infix = ensure_no_delimiters(public_key_str)
     assert infix == "PUBLIC KEY"
     return inner_text
 
@@ -69,7 +69,7 @@ def ensure_header_footer(key_str, private_key_pwd=None, infix="PRIVATE KEY"):
 
 def make_oneline(string):
     try:
-        string, _ = remove_delimiters(string)
+        string, _ = ensure_no_delimiters(string)
         string = re.sub("\\s", "", string)
     except ValueError:
         pass
