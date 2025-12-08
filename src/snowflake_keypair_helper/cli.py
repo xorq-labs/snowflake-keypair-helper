@@ -20,10 +20,10 @@ from snowflake_keypair_helper.init_state_utils import (
 
 
 def public_key_from_path(path, prefix=snowflake_env_var_prefix):
-    from snowflake_keypair_helper.env_utils import parse_env_file
+    from snowflake_keypair_helper.env_utils import parse_env_path
     from snowflake_keypair_helper.con_utils import make_env_name
 
-    dct = parse_env_file(path)
+    dct = parse_env_path(path)
     public_key = dct[make_env_name("PUBLIC_KEY", prefix=prefix)]
     return public_key
 
@@ -56,15 +56,19 @@ def gen_commands():
 @click.option("--password", default=None)
 @click.option("--prefix", default=snowflake_env_var_prefix)
 @click.option("--encrypted/--no-encrypted", default=True)
+@click.option("--oneline/--no-oneline", default=True)
 def skh_generate_keypair(
     path,
     password=None,
     prefix=snowflake_env_var_prefix,
     encrypted=True,
+    oneline=True,
 ):
     path = None if path == "-" else Path(path)
     keypair = SnowflakeKeypair.generate(password=password)
-    path = keypair.to_env_path(path=path, prefix=prefix, encrypted=encrypted)
+    path = keypair.to_env_path(
+        path=path, prefix=prefix, encrypted=encrypted, oneline=oneline
+    )
     return path
 
 

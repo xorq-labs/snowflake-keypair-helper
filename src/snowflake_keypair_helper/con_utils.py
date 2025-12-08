@@ -211,9 +211,9 @@ def execute_statements(con, statements):
 
 
 def assign_public_key(con, user, public_key_str, assert_value=True):
-    from snowflake_keypair_helper.general_utils import remove_public_key_delimiters
+    from snowflake_keypair_helper.general_utils import ensure_no_delimiters
 
-    removed = remove_public_key_delimiters(public_key_str)
+    removed, _ = ensure_no_delimiters(public_key_str)
     statement = f"ALTER USER {user} SET RSA_PUBLIC_KEY='{removed}';"
     dcts = execute_statements(con, statement)
     if assert_value:
