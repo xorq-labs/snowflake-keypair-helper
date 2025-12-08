@@ -56,15 +56,19 @@ def gen_commands():
 @click.option("--password", default=None)
 @click.option("--prefix", default=snowflake_env_var_prefix)
 @click.option("--encrypted/--no-encrypted", default=True)
+@click.option("--oneline/--no-oneline", default=True)
 def skh_generate_keypair(
     path,
     password=None,
     prefix=snowflake_env_var_prefix,
     encrypted=True,
+    oneline=True,
 ):
     path = None if path == "-" else Path(path)
     keypair = SnowflakeKeypair.generate(password=password)
-    path = keypair.to_env_path(path=path, prefix=prefix, encrypted=encrypted)
+    path = keypair.to_env_path(
+        path=path, prefix=prefix, encrypted=encrypted, oneline=oneline
+    )
     return path
 
 
