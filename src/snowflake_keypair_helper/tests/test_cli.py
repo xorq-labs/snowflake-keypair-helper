@@ -24,7 +24,9 @@ all_cli_command_names = tuple(command.name for command in gen_commands())
 def do_popen_communicate(*args, do_decode=True):
     popened = Popen(args, stdout=PIPE, stderr=PIPE)
     out, err = popened.communicate()
-    return (popened.returncode, out.decode("ascii"), err.decode("ascii"), popened)
+    if do_decode:
+        (out, err) = (el.decode("utf-8") for el in (out, err))
+    return (popened.returncode, out, err, popened)
 
 
 @pytest.mark.benchmark
