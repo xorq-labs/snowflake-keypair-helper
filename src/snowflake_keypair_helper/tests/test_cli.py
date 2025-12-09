@@ -1,7 +1,7 @@
 import re
 from subprocess import (
-    Popen,
     PIPE,
+    Popen,
 )
 
 import pytest
@@ -10,8 +10,8 @@ from snowflake_keypair_helper.cli import (
     gen_commands,
 )
 from snowflake_keypair_helper.constants import (
-    snowflake_env_var_prefix,
     gh_test_user,
+    snowflake_env_var_prefix,
 )
 from snowflake_keypair_helper.utils.env_utils import (
     parse_env_path,

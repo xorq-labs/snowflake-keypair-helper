@@ -20,16 +20,16 @@ from cryptography.hazmat.primitives.serialization import (
 )
 
 from snowflake_keypair_helper.constants import (
-    snowflake_env_var_prefix,
     default_env_path,
+    snowflake_env_var_prefix,
 )
 from snowflake_keypair_helper.utils.dataclass_utils import (
     validate_dataclass_types,
 )
 from snowflake_keypair_helper.utils.general_utils import (
     decode_ascii,
-    ensure_header_footer,
     encode_utf8,
+    ensure_header_footer,
     filter_none_one,
     make_oneline,
     make_private_key_pwd,

@@ -1,12 +1,12 @@
 import pytest
 
-from snowflake_keypair_helper.utils.con_utils import (
-    connect_env,
-    execute_statements,
-)
 from snowflake_keypair_helper.constants import (
     gh_test_role,
     gh_user,
+)
+from snowflake_keypair_helper.utils.con_utils import (
+    connect_env,
+    execute_statements,
 )
 
 

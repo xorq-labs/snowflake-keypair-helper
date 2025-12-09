@@ -4,12 +4,6 @@ from cryptography.hazmat.primitives.serialization import (
 )
 from snowflake.connector.errors import DatabaseError
 
-from snowflake_keypair_helper.utils.con_utils import (
-    assign_public_key,
-    connect_env_keypair,
-    con_to_adbc_con,
-    deassign_public_key,
-)
 from snowflake_keypair_helper.constants import (
     default_database,
     default_schema,
@@ -17,6 +11,12 @@ from snowflake_keypair_helper.constants import (
     gh_user,
 )
 from snowflake_keypair_helper.snowflake_keypair import SnowflakeKeypair
+from snowflake_keypair_helper.utils.con_utils import (
+    assign_public_key,
+    con_to_adbc_con,
+    connect_env_keypair,
+    deassign_public_key,
+)
 
 
 @pytest.fixture

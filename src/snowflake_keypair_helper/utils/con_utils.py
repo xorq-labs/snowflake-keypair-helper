@@ -10,8 +10,8 @@ from snowflake_keypair_helper.constants import (
 )
 from snowflake_keypair_helper.enums import (
     SnowflakeAuthenticator,
-    SnowflakeFields,
     SnowflakeEnvFields,
+    SnowflakeFields,
 )
 from snowflake_keypair_helper.utils.env_utils import (
     with_env_path,
@@ -86,6 +86,7 @@ def connect_env(
     from snowflake.connector import (
         connect,
     )
+
     from snowflake_keypair_helper.utils.crypto_utils import (
         maybe_decrypt_private_key_snowflake,
     )
@@ -150,6 +151,7 @@ def con_to_adbc_kwargs(
             from adbc_driver_snowflake import (
                 DatabaseOptions,
             )
+
             from snowflake_keypair_helper.utils.crypto_utils import SnowflakeKeypair
 
             # we know the private key is unencrypted DER format

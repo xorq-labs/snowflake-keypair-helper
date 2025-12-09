@@ -12,6 +12,8 @@ from snowflake_keypair_helper.snowflake_keypair import (
 )
 from snowflake_keypair_helper.utils.con_utils import (
     assign_public_key as _assign_public_key,
+)
+from snowflake_keypair_helper.utils.con_utils import (
     connect_env,
     make_env_name,
 )
