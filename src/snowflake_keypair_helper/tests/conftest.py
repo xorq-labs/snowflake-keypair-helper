@@ -1,6 +1,6 @@
 import pytest
 
-from snowflake_keypair_helper.con_utils import (
+from snowflake_keypair_helper.utils.con_utils import (
     connect_env,
     execute_statements,
 )

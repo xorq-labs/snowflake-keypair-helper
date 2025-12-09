@@ -11,11 +11,11 @@ import pytest
         "snowflake_keypair_helper.api",
         "snowflake_keypair_helper.cli",
         "snowflake_keypair_helper.constants",
-        "snowflake_keypair_helper.con_utils",
-        "snowflake_keypair_helper.crypto_utils",
-        "snowflake_keypair_helper.dataclass_utils",
-        "snowflake_keypair_helper.env_utils",
-        "snowflake_keypair_helper.init_state_utils",
+        "snowflake_keypair_helper.utils.con_utils",
+        "snowflake_keypair_helper.utils.crypto_utils",
+        "snowflake_keypair_helper.utils.dataclass_utils",
+        "snowflake_keypair_helper.utils.env_utils",
+        "snowflake_keypair_helper.utils.init_state_utils",
     ),
 )
 def test_benchmark_module_import(module):

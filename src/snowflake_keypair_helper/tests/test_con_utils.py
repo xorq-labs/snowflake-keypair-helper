@@ -4,7 +4,7 @@ from cryptography.hazmat.primitives.serialization import (
 )
 from snowflake.connector.errors import DatabaseError
 
-from snowflake_keypair_helper.con_utils import (
+from snowflake_keypair_helper.utils.con_utils import (
     assign_public_key,
     connect_env_keypair,
     con_to_adbc_con,

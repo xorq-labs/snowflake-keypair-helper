@@ -13,7 +13,7 @@ from snowflake_keypair_helper.constants import (
     snowflake_env_var_prefix,
     gh_test_user,
 )
-from snowflake_keypair_helper.env_utils import (
+from snowflake_keypair_helper.utils.env_utils import (
     parse_env_path,
 )
 

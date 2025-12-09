@@ -13,7 +13,7 @@ from snowflake_keypair_helper.enums import (
     SnowflakeFields,
     SnowflakeEnvFields,
 )
-from snowflake_keypair_helper.env_utils import (
+from snowflake_keypair_helper.utils.env_utils import (
     with_env_path,
 )
 
@@ -86,7 +86,7 @@ def connect_env(
     from snowflake.connector import (
         connect,
     )
-    from snowflake_keypair_helper.crypto_utils import (
+    from snowflake_keypair_helper.utils.crypto_utils import (
         maybe_decrypt_private_key_snowflake,
     )
 
@@ -150,7 +150,7 @@ def con_to_adbc_kwargs(
             from adbc_driver_snowflake import (
                 DatabaseOptions,
             )
-            from snowflake_keypair_helper.crypto_utils import SnowflakeKeypair
+            from snowflake_keypair_helper.utils.crypto_utils import SnowflakeKeypair
 
             # we know the private key is unencrypted DER format
             keypair = SnowflakeKeypair.from_bytes_der(con._private_key)
@@ -212,7 +212,7 @@ def execute_statements(con, statements):
 
 
 def assign_public_key(con, user, public_key_str, assert_value=True):
-    from snowflake_keypair_helper.general_utils import ensure_no_delimiters
+    from snowflake_keypair_helper.utils.general_utils import ensure_no_delimiters
 
     removed, _ = ensure_no_delimiters(public_key_str)
     statement = f"ALTER USER {user} SET RSA_PUBLIC_KEY='{removed}';"

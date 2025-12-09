@@ -7,7 +7,7 @@ from snowflake_keypair_helper.constants import (
 
 
 def create_user(con, user=gh_test_user, default_warehouse=default_warehouse):
-    from snowflake_keypair_helper.con_utils import execute_statements
+    from snowflake_keypair_helper.utils.con_utils import execute_statements
 
     statement = f"""
     USE ROLE USERADMIN;
@@ -20,7 +20,7 @@ def create_and_grant_modify_auth_role(
     con, role=gh_test_role, on_user=gh_test_user, to_user=gh_user
 ):
     # https://docs.snowflake.com/en/user-guide/key-pair-auth#grant-the-privilege-to-assign-a-public-key-to-a-snowflake-user
-    from snowflake_keypair_helper.con_utils import execute_statements
+    from snowflake_keypair_helper.utils.con_utils import execute_statements
 
     statement = f"""
     USE ROLE USERADMIN;
