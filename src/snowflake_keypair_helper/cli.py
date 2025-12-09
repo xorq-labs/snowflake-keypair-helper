@@ -72,6 +72,13 @@ def skh_generate_keypair(
     return path
 
 
+@click.command(help="validate credentials")
+@click.option("--env-path", default=devnull)
+def skh_validate_credentials(env_path=devnull):
+    connect_env(env_path=env_path)
+    print("snowflake-keypair-helper: successfully validated credentials")
+
+
 @click.command(help="assign a public key to a user")
 @click.argument("user")
 @click.option("--public_key_str", default=None)

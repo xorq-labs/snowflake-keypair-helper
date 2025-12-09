@@ -30,6 +30,7 @@ Issues = "https://github.com/xorq-labs/snowflake-keypair-helper/issues"
 
 [project.scripts]
 skh-generate-keypair = "snowflake_keypair_helper.cli:skh_generate_keypair"
+skh-validate-credentials = "snowflake_keypair_helper.cli:skh_validate_credentials"
 skh-assign-public-key = "snowflake_keypair_helper.cli:skh_assign_public_key"
 skh-create-user = "snowflake_keypair_helper.cli:skh_create_user"
 skh-list-cli-commands = "snowflake_keypair_helper.cli:skh_list_cli_commands"
