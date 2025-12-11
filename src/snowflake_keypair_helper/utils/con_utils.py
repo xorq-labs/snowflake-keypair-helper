@@ -16,6 +16,9 @@ from snowflake_keypair_helper.enums import (
 from snowflake_keypair_helper.utils.env_utils import (
     with_env_path,
 )
+from snowflake_keypair_helper.utils.general_utils import (
+    ensure_header_footer,
+)
 
 
 def make_env_name(name, prefix=snowflake_env_var_prefix):
@@ -69,6 +72,18 @@ def maybe_process_keypair(kwargs):
                 SnowflakeFields.authenticator: SnowflakeAuthenticator.keypair,
                 SnowflakeFields.private_key: keypair.private_str,
                 SnowflakeFields.private_key_pwd: keypair.private_key_pwd,
+            }
+        case {
+            SnowflakeFields.authenticator: SnowflakeAuthenticator.keypair,
+            SnowflakeFields.private_key: key_str,
+            **rest,
+        }:
+            kwargs = rest | {
+                SnowflakeFields.authenticator: SnowflakeAuthenticator.keypair,
+                SnowflakeFields.private_key: ensure_header_footer(
+                    key_str,
+                    private_key_pwd=rest.get(SnowflakeFields.private_key_pwd),
+                ),
             }
         case _:
             pass
