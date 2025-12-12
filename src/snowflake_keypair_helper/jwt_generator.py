@@ -22,11 +22,11 @@ from attr.validators import (
 )
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import (
-    load_pem_private_key,
+    Encoding,
+    PublicFormat,
     load_der_private_key,
+    load_pem_private_key,
 )
-from cryptography.hazmat.primitives.serialization import Encoding
-from cryptography.hazmat.primitives.serialization import PublicFormat
 
 
 try:

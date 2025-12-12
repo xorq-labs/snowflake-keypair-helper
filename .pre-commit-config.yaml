@@ -16,16 +16,16 @@ repos:
         args: [--ignore-words=.codespell.ignore-words]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.12.7
+    rev: v0.14.3
     hooks:
       # Run the linter.
-      - id: ruff
+      - id: ruff-check
         args: ["--output-format=full", "--fix", "src"]
       # Run the formatter.
       - id: ruff-format
   - repo: https://github.com/astral-sh/uv-pre-commit
     # uv version.
-    rev: 0.8.22
+    rev: 0.9.7
     hooks:
       # Update the uv lockfile
       - id: uv-lock

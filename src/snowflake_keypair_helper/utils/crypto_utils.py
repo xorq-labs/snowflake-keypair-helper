@@ -5,12 +5,12 @@ from cryptography.hazmat.primitives.serialization import (
 from snowflake_keypair_helper.enums import (
     SnowflakeFields,
 )
-from snowflake_keypair_helper.general_utils import (
-    encode_utf8,
-    make_private_key_pwd,
-)
 from snowflake_keypair_helper.snowflake_keypair import (
     SnowflakeKeypair,
+)
+from snowflake_keypair_helper.utils.general_utils import (
+    encode_utf8,
+    make_private_key_pwd,
 )
 
 

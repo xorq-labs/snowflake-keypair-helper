@@ -54,9 +54,11 @@
 
       pyprojectOverrides = final: prev: {
         toolz = prev.toolz.overrideAttrs (old: {
-          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ final.resolveBuildSystem {
-            setuptools = [ ];
-          };
+          nativeBuildInputs =
+            (old.nativeBuildInputs or [ ])
+            ++ final.resolveBuildSystem {
+              setuptools = [ ];
+            };
         });
       };
 
@@ -93,11 +95,13 @@
           pkgs = nixpkgs.legacyPackages.${system};
           pythonSet = pythonSets.${system}.overrideScope editableOverlay;
           virtualenv = pythonSet.mkVirtualEnv "snowflake-keypair-helper-dev-env" workspace.deps.all;
-        in {
+        in
+        {
           inherit
             pkgs
             pythonSet
-            virtualenv;
+            virtualenv
+            ;
         }
       );
       apps = forAllSystems (

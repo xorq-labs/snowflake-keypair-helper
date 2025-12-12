@@ -47,6 +47,7 @@ snowpark = [
 dev = [
     "ipython<9.7.0,>=8.19.0",
     "pre-commit>=4.3.0",
+    "ruff>=0.14.8",
 ]
 test = [
     "pytest>=8.4.2",
@@ -59,3 +60,15 @@ markers = [
     "benchmark",
 ]
 addopts = "--pdbcls=IPython.terminal.debugger:TerminalPdb"
+
+[tool.ruff.lint]
+extend-select = ["I", "ICN"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["snowflake-keypair-helper"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+lines-after-imports = 2
+
+[tool.codespell]
+skip = "*.lock,.direnv,.git"
+builtin = "clear,rare,names"

@@ -20,16 +20,16 @@ from cryptography.hazmat.primitives.serialization import (
 )
 
 from snowflake_keypair_helper.constants import (
-    snowflake_env_var_prefix,
     default_env_path,
+    snowflake_env_var_prefix,
 )
-from snowflake_keypair_helper.dataclass_utils import (
+from snowflake_keypair_helper.utils.dataclass_utils import (
     validate_dataclass_types,
 )
-from snowflake_keypair_helper.general_utils import (
+from snowflake_keypair_helper.utils.general_utils import (
     decode_ascii,
-    ensure_header_footer,
     encode_utf8,
+    ensure_header_footer,
     filter_none_one,
     make_oneline,
     make_private_key_pwd,
@@ -105,7 +105,7 @@ class SnowflakeKeypair:
         encrypted: bool = True,
         oneline: bool = True,
     ):
-        from snowflake_keypair_helper.con_utils import make_env_name
+        from snowflake_keypair_helper.utils.con_utils import make_env_name
 
         names_fields = (
             (
@@ -200,7 +200,7 @@ class SnowflakeKeypair:
 
     @classmethod
     def from_environment(cls, ctx=os.environ, prefix=prefix):
-        from snowflake_keypair_helper.con_utils import make_env_name
+        from snowflake_keypair_helper.utils.con_utils import make_env_name
 
         kwargs = {
             field: ctx.get(make_env_name(name, prefix=prefix))
@@ -213,7 +213,7 @@ class SnowflakeKeypair:
 
     @classmethod
     def from_env_path(cls, path=default_path, prefix=prefix):
-        from snowflake_keypair_helper.env_utils import parse_env_path
+        from snowflake_keypair_helper.utils.env_utils import parse_env_path
 
         ctx = parse_env_path(path)
         return cls.from_environment(ctx=ctx, prefix=prefix)

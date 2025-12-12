@@ -4,25 +4,28 @@ from pathlib import Path
 
 import click
 
-from snowflake_keypair_helper.con_utils import (
-    assign_public_key as _assign_public_key,
-    connect_env,
-)
 from snowflake_keypair_helper.constants import (
     snowflake_env_var_prefix,
 )
 from snowflake_keypair_helper.snowflake_keypair import (
     SnowflakeKeypair,
 )
-from snowflake_keypair_helper.init_state_utils import (
+from snowflake_keypair_helper.utils.con_utils import (
+    assign_public_key as _assign_public_key,
+)
+from snowflake_keypair_helper.utils.con_utils import (
+    connect_env,
+    make_env_name,
+)
+from snowflake_keypair_helper.utils.env_utils import (
+    parse_env_path,
+)
+from snowflake_keypair_helper.utils.init_state_utils import (
     create_user as _create_user,
 )
 
 
 def public_key_from_path(path, prefix=snowflake_env_var_prefix):
-    from snowflake_keypair_helper.env_utils import parse_env_path
-    from snowflake_keypair_helper.con_utils import make_env_name
-
     dct = parse_env_path(path)
     public_key = dct[make_env_name("PUBLIC_KEY", prefix=prefix)]
     return public_key
@@ -74,9 +77,12 @@ def skh_generate_keypair(
 
 @click.command(help="validate credentials")
 @click.option("--env-path", default=devnull)
-def skh_validate_credentials(env_path=devnull):
-    connect_env(env_path=env_path)
-    print("snowflake-keypair-helper: successfully validated credentials")
+@click.option("--prefix", default=None)
+@click.option("--connection-name", default=None)
+def skh_validate_credentials(env_path=devnull, prefix=None, connection_name=None):
+    con = connect_env(env_path=env_path, prefix=prefix, connection_name=connection_name)
+    dct = {name: getattr(con, name) for name in ("account", "user", "role")}
+    print(f"snowflake-keypair-helper: successfully validated credentials for {dct}")
 
 
 @click.command(help="assign a public key to a user")
