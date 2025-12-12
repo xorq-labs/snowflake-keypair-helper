@@ -6,6 +6,7 @@ import toolz
 from snowflake_keypair_helper.constants import (
     default_database,
     default_schema,
+    snowflake_connection_name_formatter,
     snowflake_env_var_prefix,
 )
 from snowflake_keypair_helper.enums import (
@@ -96,6 +97,8 @@ def connect_env(
     schema=default_schema,
     authenticator=SnowflakeAuthenticator.keypair,
     env_path=os.devnull,
+    prefix=None,
+    connection_name=None,
     **overrides,
 ):
     from snowflake.connector import (
@@ -106,10 +109,27 @@ def connect_env(
         maybe_decrypt_private_key_snowflake,
     )
 
+    def arbitrate_prefix(prefix, connection_name):
+        match (prefix, connection_name):
+            case (None, None):
+                return snowflake_env_var_prefix
+            case (None, connection_name):
+                return snowflake_connection_name_formatter.format(
+                    connection_name=connection_name
+                )
+            case (prefix, None):
+                return prefix
+            case (_, _):
+                raise ValueError(
+                    "must pass no more than one of prefix, connection_name"
+                )
+        raise ValueError
+
+    prefix = arbitrate_prefix(prefix, connection_name)
     with with_env_path(env_path):
         kwargs = (
-            get_connection_defaults()
-            | get_authenticator_credentials(authenticator)
+            get_connection_defaults(prefix=prefix)
+            | get_authenticator_credentials(authenticator, prefix=prefix)
             | {
                 SnowflakeFields.passcode: passcode,
                 SnowflakeFields.authenticator: authenticator,
