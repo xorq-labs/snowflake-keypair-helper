@@ -3,6 +3,7 @@ from sysconfig import get_python_version
 
 
 snowflake_env_var_prefix = "SNOWFLAKE_"
+snowflake_connection_name_formatter = "SNOWFLAKE_CONNECTIONS_{connection_name}_"
 
 default_database = "SNOWFLAKE_SAMPLE_DATA"
 default_schema = "TPCH_SF1"
