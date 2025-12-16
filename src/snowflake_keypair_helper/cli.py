@@ -4,25 +4,28 @@ from pathlib import Path
 
 import click
 
-from snowflake_keypair_helper.con_utils import (
-    assign_public_key as _assign_public_key,
-    connect_env,
-)
 from snowflake_keypair_helper.constants import (
     snowflake_env_var_prefix,
 )
 from snowflake_keypair_helper.snowflake_keypair import (
     SnowflakeKeypair,
 )
-from snowflake_keypair_helper.init_state_utils import (
+from snowflake_keypair_helper.utils.con_utils import (
+    assign_public_key as _assign_public_key,
+)
+from snowflake_keypair_helper.utils.con_utils import (
+    connect_env,
+    make_env_name,
+)
+from snowflake_keypair_helper.utils.env_utils import (
+    parse_env_path,
+)
+from snowflake_keypair_helper.utils.init_state_utils import (
     create_user as _create_user,
 )
 
 
 def public_key_from_path(path, prefix=snowflake_env_var_prefix):
-    from snowflake_keypair_helper.env_utils import parse_env_path
-    from snowflake_keypair_helper.con_utils import make_env_name
-
     dct = parse_env_path(path)
     public_key = dct[make_env_name("PUBLIC_KEY", prefix=prefix)]
     return public_key

@@ -1,5 +1,5 @@
-from sysconfig import get_python_version
 from pathlib import Path
+from sysconfig import get_python_version
 
 
 snowflake_env_var_prefix = "SNOWFLAKE_"
