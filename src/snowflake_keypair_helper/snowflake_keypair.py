@@ -21,6 +21,7 @@ from cryptography.hazmat.primitives.serialization import (
 
 from snowflake_keypair_helper.constants import (
     default_env_path,
+    snowflake_connection_name_formatter,
     snowflake_env_var_prefix,
 )
 from snowflake_keypair_helper.utils.dataclass_utils import (
@@ -210,6 +211,13 @@ class SnowflakeKeypair:
             )
         }
         return cls.from_str_pem(**kwargs)
+
+    @classmethod
+    def from_connection_name(cls, connection_name, ctx=os.environ):
+        prefix = snowflake_connection_name_formatter.format(
+            connection_name=connection_name
+        )
+        return cls.from_environment(ctx=ctx, prefix=prefix)
 
     @classmethod
     def from_env_path(cls, path=default_path, prefix=prefix):
