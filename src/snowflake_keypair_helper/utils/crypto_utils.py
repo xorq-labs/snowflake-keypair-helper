@@ -47,13 +47,25 @@ def maybe_decrypt_private_key_snowflake(kwargs: dict):
                 )
             }
         case {SnowflakeFields.private_key: private_key, **rest}:
-            assert isinstance(private_key, bytes)
-            # ctor will fail if other than unencrypted DER format (bytes)
-            SnowflakeKeypair.from_bytes_der(private_key)
+            match private_key:
+                case bytes():
+                    pass
+                case str():
+                    kwargs = rest | {
+                        SnowflakeFields.private_key: SnowflakeKeypair.from_str_pem(
+                            private_key
+                        ).get_private_bytes(encoding=Encoding.DER, encrypted=False),
+                    }
+                case _:
+                    raise ValueError(
+                        f"Don't know how to handle private_key of type {type(private_key)}"
+                    )
         case _:
             raise ValueError(
                 f"`{SnowflakeFields.private_key}` not found in kwargs: {tuple(kwargs)}"
             )
+    # ctor will fail if other than unencrypted DER format (bytes)
+    SnowflakeKeypair.from_bytes_der(kwargs[SnowflakeFields.private_key])
     return kwargs
 
 
