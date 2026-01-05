@@ -82,11 +82,12 @@ and cd into it:
 ./with-uvenv uv run skh-list-cli-commands
 ```
 
-then, generate a keypair and assign it to a user:
+then, generate a keypair, create the user and assign the public key to the user:
 
 ```bash
 skh-generate-keypair alice.user.env
-skh-assign-public-key alice --path alice.user.env # alice is snowflake user name and assumes admin role
+skh-create-user alice
+skh-assign-public-key alice --path alice.user.env
 ```
 
 and then, connect using the keypair you've created:
@@ -138,6 +139,12 @@ skh-generate-keypair my-keypair.env
 ```
 
 the keypair is serialized to disk in a file named `my-keypair.env`. after this, you can share the public key with your snowflake user admin to assign to your user.
+
+### as a Snowflake admin, create a new user
+
+```bash
+skh-create-user "$NEW_SNOWFLAKE_USER"
+```
 
 ### as a Snowflake admin, assign a public key from a file
 
