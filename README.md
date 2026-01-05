@@ -41,6 +41,7 @@ Use the CLI tool:
 
 ```bash
 skh-generate-keypair          # generate a new keypair and write it to disk
+skh-validate-credentials      # validate that con creation args work
 skh-assign-public-key         # assign a public key to a user
 skh-create-user               # create a user
 skh-list-cli-commands         # list all commands available from this cli (snowflake_keypair_helper)
