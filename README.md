@@ -41,6 +41,7 @@ Use the CLI tool:
 
 ```bash
 skh-generate-keypair          # generate a new keypair and write it to disk
+skh-validate-credentials      # validate that con creation args work
 skh-assign-public-key         # assign a public key to a user
 skh-create-user               # create a user
 skh-list-cli-commands         # list all commands available from this cli (snowflake_keypair_helper)
@@ -81,11 +82,12 @@ and cd into it:
 ./with-uvenv uv run skh-list-cli-commands
 ```
 
-then, generate a keypair and assign it to a user:
+then, generate a keypair, create the user and assign the public key to the user:
 
 ```bash
-generate-keypair alice.user.env
-assign-public-key alice --path alice.user.env # alice is snowflake user name and assumes admin role
+skh-generate-keypair alice.user.env
+skh-create-user alice
+skh-assign-public-key alice --path alice.user.env
 ```
 
 and then, connect using the keypair you've created:
@@ -133,23 +135,29 @@ SNOWFLAKE_ROLE="ACCOUNTADMIN" # or "ORGADMIN"/"USERADMIN"
 ### as a developer, generate a new keypair and password
 
 ```bash
-generate-keypair my-keypair.env
+skh-generate-keypair my-keypair.env
 ```
 
 the keypair is serialized to disk in a file named `my-keypair.env`. after this, you can share the public key with your snowflake user admin to assign to your user.
+
+### as a Snowflake admin, create a new user
+
+```bash
+skh-create-user "$NEW_SNOWFLAKE_USER"
+```
 
 ### as a Snowflake admin, assign a public key from a file
 
 ```bash
 # file should set a variable named SNOWFLAKE_PUBLIC_KEY
-assign-public-key "$SNOWFLAKE_USER" --path "$SNOWFLAKE_ENV_FILE"
+skh-assign-public-key "$SNOWFLAKE_USER" --path "$SNOWFLAKE_ENV_FILE"
 ```
 
 ### as a Snowflake admin, assign a public key from an environment variable
 
 ```bash
 # NOTE: we pass `--` so that `--` in args is not interpreted as a flag
-assign-public-key -- "$USER" --public_key_str "$USER_PUBLIC_KEY"
+skh-assign-public-key -- "$USER" --public-key-str "$USER_PUBLIC_KEY"
 ```
 
 the connection created to assign the public key gets its arguments from your environment variables, which default to `SNOWFLAKE_` prefixed variable names like `SNOWFLAKE_USER`.
@@ -160,8 +168,8 @@ if you need to supplement your environment variables, you can pass `--env-path` 
 
 ```bash
 path="$TEST_USER.env"
-generate-keypair "$path"
-assign-public-key \
+skh-generate-keypair "$path"
+skh-assign-public-key \
     "$TEST_USER" \
     --path "$path" \
     --env-path .env.secrets.snowflake.keypair
