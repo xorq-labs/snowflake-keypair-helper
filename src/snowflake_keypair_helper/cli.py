@@ -87,20 +87,31 @@ def skh_validate_credentials(env_path=devnull, prefix=None, connection_name=None
 
 @click.command(help="assign a public key to a user")
 @click.argument("user")
-@click.option("--public_key_str", default=None)
+@click.option("--public-key-str", default=None)
 @click.option("--path", default=None)
 @click.option("--env-path", default=devnull)
-def skh_assign_public_key(user, public_key_str=None, path=None, env_path=devnull):
+@click.option("--prefix", default=None)
+@click.option("--connection-name", default=None)
+def skh_assign_public_key(
+    user,
+    public_key_str=None,
+    path=None,
+    env_path=devnull,
+    prefix=None,
+    connection_name=None,
+):
     public_key_str = arbitrate_public_key(public_key_str=public_key_str, path=path)
-    con = connect_env(env_path=env_path)
+    con = connect_env(env_path=env_path, prefix=prefix, connection_name=connection_name)
     _assign_public_key(con, user, public_key_str, assert_value=True)
 
 
 @click.command(help="create a user")
 @click.argument("user")
 @click.option("--env-path", default=devnull)
-def skh_create_user(user, env_path=devnull):
-    con = connect_env(env_path=env_path)
+@click.option("--prefix", default=None)
+@click.option("--connection-name", default=None)
+def skh_create_user(user, env_path=devnull, prefix=None, connection_name=None):
+    con = connect_env(env_path=env_path, prefix=prefix, connection_name=connection_name)
     _create_user(con, user)
 
 

@@ -12,6 +12,7 @@ from snowflake_keypair_helper.utils.con_utils import (
     connect_env_password,
     connect_env_password_mfa,
     deassign_public_key,
+    execute_statements,
 )
 from snowflake_keypair_helper.utils.crypto_utils import (
     decrypt_private_bytes_snowflake,
@@ -34,6 +35,7 @@ __all__ = [
     "connect_env_password_mfa",
     "connect_env_keypair",
     "deassign_public_key",
+    "execute_statements",
     # utils.crypto_utils
     "decrypt_private_bytes_snowflake",
     "encrypt_private_bytes_snowflake_adbc",
