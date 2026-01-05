@@ -132,6 +132,10 @@
             drv = virtualenv;
             name = "skh-list-cli-commands";
           };
+          skh-validate-credentials = drvToApp {
+            drv = virtualenv;
+            name = "skh-validate-credentials";
+          };
           default = self.apps.${system}.ipython;
         }
       );
